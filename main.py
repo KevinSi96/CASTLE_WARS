@@ -27,7 +27,6 @@ def main():
             archer.draw(screen)
 
         pg.display.update()
-
     loop = 1
     while loop:
         clock.tick(10)
@@ -41,7 +40,7 @@ def main():
         if keys[pg.K_d]:
             for archer in archers:
                 archer.deploy = True
-
+        # HO AGGIUNTO QUESTA RIGA DI COMMENTO
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
