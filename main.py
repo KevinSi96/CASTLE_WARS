@@ -14,6 +14,7 @@ clock = pg.time.Clock()
 BG = pg.transform.scale(pg.image.load("sprites/background/BG.jpg"), (WIDTH, HEIGHT))
 
 
+
 def main():
     archers = []
 
