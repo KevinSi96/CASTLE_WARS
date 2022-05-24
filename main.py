@@ -42,6 +42,7 @@ def main():
             for archer in archers:
                 archer.deploy = True
 
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 loop = 0
