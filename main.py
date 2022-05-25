@@ -30,24 +30,24 @@ def main():
 
     loop = 1
     while loop:
-        clock.tick(24)
+        clock.tick(15)
         redraw_window()
-        keys = pg.key.get_pressed()
-
-        if keys[pg.K_t]:
-            archer = Archer(100, random.randrange(10, 30), 165, False, screen)
-            player1_resource -= archer.COST
-            archers.append(archer)
-        if keys[pg.K_d]:
-            for archer in archers:
-                # check if soldier is ready to be dispatched
-                if archer.ready_to_dispatch is True:
-                    # set dispatch to true
-                    archer.dispatch = True
+        # keys = pg.key.get_pressed()
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 loop = 0
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_t:
+                    archer = Archer(100, random.randrange(10, 30), 165, False, screen)
+                    player1_resource -= archer.COST
+                    archers.append(archer)
+                if event.key == pg.K_d:
+                    for archer in archers:
+                        # check if soldier is ready to be dispatched
+                        if archer.ready_to_dispatch is True:
+                            # set dispatch to true
+                            archer.dispatch = True
 
         for archer in archers:
             if archer.ready_to_dispatch is False:
