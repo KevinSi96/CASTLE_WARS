@@ -38,18 +38,22 @@ def main():
             archer = Archer(100, random.randrange(10, 30), 165, False, screen)
             player1_resource -= archer.COST
             archers.append(archer)
-        # if keys[pg.K_d]:
-        #     for archer in archers:
-        #         archer.deploy = True
+        if keys[pg.K_d]:
+            for archer in archers:
+                # check if soldier is ready to be dispatched
+                if archer.ready_to_dispatch is True:
+                    # set dispatch to true
+                    archer.dispatch = True
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 loop = 0
 
         for archer in archers:
-            if archer.dispatch is False:
+            if archer.ready_to_dispatch is False:
                 archer.train()
-            else:
+            # if soldier is dispatchable it gets deployed
+            elif archer.dispatch is True:
                 archer.move()
                 archer.update()
 

@@ -20,6 +20,7 @@ class Archer(Player, pg.sprite.Sprite):
         self.turns = 0
         self.current_time = 0
         self.dispatch = False
+        self.ready_to_dispatch = False
         self.animation = self.loadImage()
         self.start_time = time.time()
         self.screen = screen
@@ -45,11 +46,10 @@ class Archer(Player, pg.sprite.Sprite):
         self.x += self.SPEED
 
     def train(self):
-        # once the archer gets instantiated the start timer gets initialized, then on the main method we issue the train command
-        # that waits 5 seconds(turns) before dispatching the archer.
-        # We need to change this logic anyway because we need to add a queue, currently, we can issue any amount of archers that will get dispatched automatically
         if round(self.current_time - self.start_time) < self.TRAIN_TURNS:
             self.current_time = time.time()
             print(str(round(self.current_time - self.start_time)))
+        # we set ready to dispatch once the training time is done, then in the main when the dispatch order is issued, the dispatch variable gets set to True
+        # and the soldiers gets deployed into the battle field
         else:
-            self.dispatch = True
+            self.ready_to_dispatch = True
