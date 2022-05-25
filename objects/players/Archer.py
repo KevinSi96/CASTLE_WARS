@@ -7,7 +7,7 @@ from objects.players.Player import Player
 
 
 class Archer(Player, pg.sprite.Sprite):
-    TRAIN_TURNS = 5
+    TRAIN_TURNS = 1
     RANGE = 10
     HIT_DAMAGE = 3
     REST = 1
