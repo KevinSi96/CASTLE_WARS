@@ -21,11 +21,14 @@ def main():
     player1_resource = INITIAL_RESOURCE
     player2_resource = INITIAL_RESOURCE
 
+    count = 0
+
     def redraw_window():
         screen.blit(BG, (0, 0))
 
         for archer in archers:
-            archer.draw(screen)
+            if archer.ready_to_dispatch is True:
+                archer.draw(screen)
 
         pg.display.update()
 
@@ -40,22 +43,18 @@ def main():
             if event.type == pg.QUIT:
                 loop = 0
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_e:
-                    archer = Archer(100, random.randrange(10, 30), 165, False, screen)
-                    player1_resource -= archer.COST
-                    if len(archers) >= 1:
-                        prev_archer = archers[len(archers) - 1]
-                        if prev_archer.ready_to_dispatch is True:
-                            archers.append(archer)
 
-                    else:
-                        archers.append(archer)
+                if event.key == pg.K_e:
+                    count += 1
+
+
                 if event.key == pg.K_z:
                     for archer in archers:
                         # check if soldier is ready to be dispatched
                         if archer.ready_to_dispatch is True:
                             # set dispatch to true
                             archer.attack = True
+
                 if event.key == pg.K_f:
                     if len(archers) > 0:
                         if index >= len(archers):
@@ -65,11 +64,27 @@ def main():
                             this_archer.attack = True
                             index += 1
 
+        for i in range(count):
+            archer = Archer(100, random.randrange(10, 30), 165, False, screen)
+            if len(archers) >= 1:
+                player1_resource -= archer.COST
+                prev_archer = archers[len(archers) - 1]
+                if prev_archer.ready_to_dispatch is True:
+                    archers.append(archer)
+                    count -= 1
+            elif len(archers) == 0:
+                archers.append(archer)
+                count -= 1
+
         for archer in archers:
             if archer.ready_to_dispatch is False:
                 archer.train()
+        if count <= 0:
+            count = 0
+        print("issued archers " + str(count) + " no. of archers: " + str(len(archers)))
+        for archer in archers:
             # if soldier is dispatchable it gets deployed
-            elif archer.attack is True:
+            if archer.attack is True:
                 archer.move()
                 archer.update()
             if archer.x > WIDTH - 100:
