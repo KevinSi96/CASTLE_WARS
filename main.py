@@ -27,9 +27,10 @@ def main():
             archer.draw(screen)
 
         pg.display.update()
+
     loop = 1
     while loop:
-        clock.tick(10)
+        clock.tick(24)
         redraw_window()
         keys = pg.key.get_pressed()
 
@@ -37,17 +38,18 @@ def main():
             archer = Archer(100, random.randrange(10, 30), 165, False, screen)
             player1_resource -= archer.COST
             archers.append(archer)
-        if keys[pg.K_d]:
-            for archer in archers:
-                archer.deploy = True
-        # HO AGGIUNTO QUESTA RIGA DI COMMENTO
+        # if keys[pg.K_d]:
+        #     for archer in archers:
+        #         archer.deploy = True
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 loop = 0
 
         for archer in archers:
-            if archer.deploy is True:
+            if archer.dispatch is False:
+                archer.train()
+            else:
                 archer.move()
                 archer.update()
 
