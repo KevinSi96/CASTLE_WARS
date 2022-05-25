@@ -14,12 +14,13 @@ class Archer(Player, pg.sprite.Sprite):
     COST = 3
     SPEED = 5
 
-    def __init__(self, health, x, y, dispatch, screen):
-        super().__init__(health, x, y, dispatch)
+    def __init__(self, health, x, y, attack, screen):
+        super().__init__(health, x, y, attack)
         self.a_count = 0
         self.turns = 0
         self.current_time = 0
-        self.dispatch = False
+        self.dead = False
+        self.attack = False
         self.ready_to_dispatch = False
         self.animation = self.loadImage()
         self.start_time = time.time()
@@ -46,10 +47,11 @@ class Archer(Player, pg.sprite.Sprite):
         self.x += self.SPEED
 
     def train(self):
+        print("training")
         if round(self.current_time - self.start_time) < self.TRAIN_TURNS:
             self.current_time = time.time()
-            print(str(round(self.current_time - self.start_time)))
         # we set ready to dispatch once the training time is done, then in the main when the dispatch order is issued, the dispatch variable gets set to True
         # and the soldiers gets deployed into the battle field
         else:
+            print("ready")
             self.ready_to_dispatch = True
