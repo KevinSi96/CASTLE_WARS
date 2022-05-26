@@ -29,6 +29,13 @@ def main():
     count_swordsmen_p1 = 0
     num_swordsmen_p1 = 0
 
+    def in_range(object1):
+        if isinstance(object1, Archer):
+            if object1.x >= WIDTH - 300 and object1.deploy:
+                object1.run = False
+                object1.ready_to_shoot()
+        return object1
+
     def attack(soldiers, soldier_index, soldier_counter):
         if isinstance(soldiers, list):
             if len(soldiers) > 0:
@@ -38,6 +45,7 @@ def main():
                 soldier_index += 1
                 if soldier.ready_to_dispatch:
                     soldier.deploy = True
+                    soldier.run = True
                     soldier_counter -= 1
         return soldier_index, soldier_counter
 
@@ -45,6 +53,7 @@ def main():
         if isinstance(soldiers, list):
             for soldier in soldiers:
                 soldier.deploy = True
+                soldier.run = True
 
     def redraw_window():
         screen.blit(BG, (0, 0))
@@ -103,7 +112,7 @@ def main():
                     num_swordsmen_p1 = 0
 
         for i in range(count_archer_p1):
-            archer = Archer(100, random.randrange(10, 30), 165, False, screen)
+            archer = Archer(100, random.randrange(10, 30), 165, False, screen, "sprites/player1/bow/run/run-", ".png")
             if len(archers_p1) >= 1:
                 prev_archer = archers_p1[len(archers_p1) - 1]
                 if prev_archer.ready_to_dispatch:
@@ -145,10 +154,10 @@ def main():
 
         for archer in archers_p1:
             # if soldier is dispatchable it gets deployed
-            if archer.deploy:
+            if archer.deploy and archer.run:
                 archer.move()
                 archer.update()
-
+            archer = in_range(archer)
         for swordsman in swordsmen_p1:
             # if soldier is dispatchable it gets deployed
             if swordsman.attack:
