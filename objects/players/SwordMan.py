@@ -46,11 +46,11 @@ class SwordMan(Player, pg.sprite.Sprite):
         self.x += self.SPEED
 
     def train(self):
-        print("training")
+        print("training sword")
         if round(self.current_time - self.start_time) < self.TRAIN_TURNS:
             self.current_time = time.time()
         # we set ready to dispatch once the training time is done, then in the main when the dispatch order is issued, the dispatch variable gets set to True
         # and the soldiers gets deployed into the battle field
         else:
-            print("ready")
+            print("ready ready sword")
             self.ready_to_dispatch = True
