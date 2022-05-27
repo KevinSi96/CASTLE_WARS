@@ -6,9 +6,9 @@ from objects.GameObject import GameObject
 
 
 class Player(GameObject):
-    def __init__(self, health, x, y, deploy):
+    def __init__(self, health, x, y, dispatch):
         super().__init__(health, x, y)
-        self.deploy = deploy
+        self.dispatch = dispatch
 
 
 
