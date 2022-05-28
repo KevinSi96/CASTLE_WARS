@@ -32,7 +32,7 @@ class SwordMan(Player, pg.sprite.Sprite):
             self.image = pg.image.load("sprites/player1/sword/run/run-" + str(i) + ".png")
             images[i] = self.image
         return images
-
+    #     modified
     def update(self):
         self.a_count += 1
         if self.a_count == len(self.animation):
