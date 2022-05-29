@@ -2,6 +2,7 @@ import random
 
 import pygame as pg
 
+from implementable import Functions
 from objects.players.Archer import Archer
 from objects.players.SwordsMan import SwordMan
 
@@ -41,27 +42,6 @@ def main():
                 print(str(round(object1.current_time - object1.start_shoot)))
         return object1
 
-    def attack(soldiers, soldier_index, soldier_counter):
-        if isinstance(soldiers, list):
-            if len(soldiers) > 0:
-                if soldier_index >= len(soldiers):
-                    soldier_index = 0
-                soldier = soldiers[soldier_index]
-                soldier_index += 1
-                if soldier.ready_to_dispatch:
-                    soldier.deploy = True
-                    soldier.run = True
-                    soldier_counter -= 1
-
-        return soldier_index, soldier_counter
-
-    def deploy_all(soldiers):
-        if isinstance(soldiers, list):
-            for soldier in soldiers:
-                if soldier.run is False and soldier.deploy is False:
-                    soldier.deploy = True
-                    soldier.run = True
-
     def redraw_window():
         screen.blit(BG, (0, 0))
 
@@ -98,50 +78,11 @@ def main():
 
         pg.display.update()
 
-    def check_added(soldiers, num_soldiers, count_soldiers):
-        if isinstance(soldiers, list):
-            for i in range(len(soldiers)):
-                if isinstance(soldiers[i], Archer):
-                    if soldiers[i].ready_to_dispatch and soldiers[i].archer_added is False:
-                        num_soldiers += 1
-                        soldiers[i].archer_added = True
-                        count_soldiers -= 1
-                elif isinstance(soldiers[i], SwordMan):
-                    if soldiers[i].ready_to_dispatch and soldiers[i].swordsman_added is False:
-                        num_soldiers += 1
-                        soldiers[i].swordsman_added = True
-                        count_soldiers -= 1
-        return num_soldiers, count_soldiers
-
-    def add_to_queue(soldiers, count_soldiers, type):
-        if isinstance(soldiers, list):
-            for i in range(count_soldiers):
-                match type:
-                    case "archers_p1":
-                        soldier = Archer(100, random.randrange(10, 30), 165, False, screen,
-                                         "sprites/player1/bow/run/run-", ".png")
-                        if len(soldiers) >= 1:
-                            prev_soldier = soldiers[len(soldiers) - 1]
-                            if prev_soldier.ready_to_dispatch:
-                                soldiers.append(soldier)
-                        elif len(soldiers) == 0:
-                            soldiers.append(soldier)
-                    case "swordsmen_p1":
-                        soldier = SwordMan(100, random.randrange(10, 30), 170, False, screen,
-                                           "sprites/player1/sword/run/run-",
-                                           ".png")
-                        if len(soldiers) >= 1:
-                            prev_soldier = soldiers[len(soldiers) - 1]
-                            if prev_soldier.ready_to_dispatch:
-                                soldiers.append(soldier)
-                        elif len(soldiers) == 0:
-                            soldiers.append(soldier)
-
     loop = 1
 
     while loop:
 
-        clock.tick(24)
+        clock.tick(15)
         redraw_window()
 
         for event in pg.event.get():
@@ -167,29 +108,30 @@ def main():
 
                 if event.key == pg.K_f:
                     if num_archer_p1 > 0:
-                        archer_index_p1, num_archer_p1 = attack(archers_p1, archer_index_p1, num_archer_p1)
+                        archer_index_p1, num_archer_p1 = Functions.attack(archers_p1, archer_index_p1, num_archer_p1)
 
                 if event.key == pg.K_d:
                     if num_archer_p1 > 0:
-                        swordsman_index_p1, num_swordsmen_p1 = attack(swordsmen_p1, swordsman_index_p1,
-                                                                      num_swordsmen_p1)
+                        swordsman_index_p1, num_swordsmen_p1 = Functions.attack(swordsmen_p1, swordsman_index_p1,
+                                                                                num_swordsmen_p1)
 
                 if event.key == pg.K_z:
-                    deploy_all(archers_p1)
-                    deploy_all(swordsmen_p1)
+                    Functions.deploy_all(archers_p1)
+                    Functions.deploy_all(swordsmen_p1)
                     num_archer_p1 = 0
                     num_swordsmen_p1 = 0
 
-        add_to_queue(archers_p1, count_archer_p1, "archers_p1")
-        # add_to_queue(swordsmen_p1, count_swordsmen_p1, "swordsmen_p1")
+        Functions.add_to_queue(archers_p1, count_archer_p1, "archers_p1", screen)
+        num_archer_p1, count_archer_p1 = Functions.check_added(archers_p1, num_archer_p1, count_archer_p1, "archers_p1")
+
+        Functions.add_to_queue(swordsmen_p1, count_swordsmen_p1, "swordsmen_p1", screen)
+        num_swordsmen_p1, count_swordsmen_p1 = Functions.check_added(swordsmen_p1, num_swordsmen_p1, count_swordsmen_p1,
+                                                                     "swordsmen_p1")
 
         if count_archer_p1 <= 0:
             count_archer_p1 = 0
         if count_swordsmen_p1 <= 0:
             count_swordsmen_p1 = 0
-
-        num_archer_p1, count_archer_p1 = check_added(archers_p1, num_archer_p1, count_archer_p1)
-        num_swordsmen_p1, count_swordsmen_p1 = check_added(swordsmen_p1, num_swordsmen_p1, count_swordsmen_p1)
 
         for i in range(len(archers_p1)):
             if archers_p1[i].ready_to_dispatch is False:
