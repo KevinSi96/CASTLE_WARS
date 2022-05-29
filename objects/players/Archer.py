@@ -10,15 +10,17 @@ class Archer(Player, pg.sprite.Sprite):
     TRAIN_TURNS = 3
     RANGE = 10
     HIT_DAMAGE = 3
-    REST = 1
+    REST = 2
     COST = 3
     SPEED = 5
 
     def __init__(self, health, x, y, deploy, screen, image_path_root, img_extension):
         super().__init__(health, x, y, deploy)
+        self.shoot_count = 0
         self.a_count = 0
         self.current_time = 0
         self.start_shoot = 0
+        self.archer_added = False
         self.run = False
         self.dead = False
         self.deploy = False
@@ -29,10 +31,13 @@ class Archer(Player, pg.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def ready_to_shoot(self):
-        self.start_shoot = time.time()
+        if self.run is False and self.shoot_count == 0:
+            self.start_shoot = time.time()
+            self.shoot_count += 1
         self.image = pg.image.load("sprites/player1/bow/ready.png")
         if self.rest():
             self.shoot()
+            self.shoot_count = 0
 
     def loadImage(self, image_path_root, img_extension, num_img):
         images = {}
@@ -58,8 +63,9 @@ class Archer(Player, pg.sprite.Sprite):
         self.animation = self.loadImage("sprites/player1/bow/shoot/shoot-", ".png", 2)
 
     def rest(self):
-        if round(self.current_time - self.start_shoot) < self.REST:
+        if self.REST > (self.current_time - self.start_shoot):
             self.current_time = time.time()
+            # print("rest timer: " + str(self.current_time - self.start_shoot))
             return False
         else:
             return True
@@ -67,8 +73,7 @@ class Archer(Player, pg.sprite.Sprite):
     def train(self):
         if round(self.current_time - self.start_time) < self.TRAIN_TURNS:
             self.current_time = time.time()
-        # we set ready to dispatch once the training time is done, then in the main when the dispatch order is issued, the dispatch variable gets set to True
-        # and the soldiers gets deployed into the battle field
         else:
             self.ready_to_dispatch = True
-
+    # we set ready to dispatch once the training time is done, then in the main when the dispatch order is issued, the dispatch variable gets set to True
+    # and the soldiers gets deployed into the battle field
