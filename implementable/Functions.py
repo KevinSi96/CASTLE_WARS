@@ -26,7 +26,7 @@ def deploy_all(soldiers):
                 soldier.run = True
 
 
-def check_added(soldiers, num_soldiers, count_soldiers, type):
+def check_added(soldiers, num_soldiers, count_soldiers, type, total):
     if isinstance(soldiers, list):
         for i in range(len(soldiers)):
             match type:
@@ -36,13 +36,15 @@ def check_added(soldiers, num_soldiers, count_soldiers, type):
                             soldiers[i].archer_added = True
                             num_soldiers += 1
                             count_soldiers -= 1
+                            total += 1
                 case "swordsmen_p1":
                     if isinstance(soldiers[i], SwordMan):
                         if soldiers[i].ready_to_dispatch and soldiers[i].swordsman_added is False:
                             soldiers[i].swordsman_added = True
                             num_soldiers += 1
                             count_soldiers -= 1
-    return num_soldiers, count_soldiers
+                            total += 1
+    return num_soldiers, count_soldiers, total
 
 
 def add_to_queue(soldiers, count_soldiers, type, screen):
@@ -52,19 +54,19 @@ def add_to_queue(soldiers, count_soldiers, type, screen):
                 case "archers_p1":
                     soldier = Archer(100, random.randrange(10, 30), 165, False, screen,
                                      "sprites/player1/bow/run/run-", ".png")
-                    if len(soldiers) >= 1:
+                    if len(soldiers) > 0:
                         prev_soldier = soldiers[len(soldiers) - 1]
-                        if prev_soldier.ready_to_dispatch:
+                        if prev_soldier.ready_to_dispatch and prev_soldier.archer_added:
                             soldiers.append(soldier)
-                    elif len(soldiers) == 0:
+                    else:
                         soldiers.append(soldier)
                 case "swordsmen_p1":
                     soldier = SwordMan(100, random.randrange(10, 30), 170, False, screen,
                                        "sprites/player1/sword/run/run-",
                                        ".png")
-                    if len(soldiers) >= 1:
+                    if len(soldiers) > 0:
                         prev_soldier = soldiers[len(soldiers) - 1]
-                        if prev_soldier.ready_to_dispatch:
+                        if prev_soldier.ready_to_dispatch and prev_soldier.swordsman_added:
                             soldiers.append(soldier)
-                    elif len(soldiers) == 0:
+                    else:
                         soldiers.append(soldier)
