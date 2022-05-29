@@ -3,7 +3,7 @@ import random
 import pygame as pg
 
 from objects.players.Archer import Archer
-from objects.players.SwordMan import SwordMan
+from objects.players.SwordsMan import SwordMan
 
 WIDTH, HEIGHT = 1000, 250
 
@@ -65,30 +65,77 @@ def main():
     def redraw_window():
         screen.blit(BG, (0, 0))
 
-        ready_archers_label_1 = default_font.render(f"Ready Archers: {num_archer_p1}", 1, (255, 255, 255))
-        ready_swordsmen_label_1 = default_font.render(f"Ready Swordsmen: {num_swordsmen_p1}", 1, (255, 255, 255))
-        archers_in_training_1 = default_font.render(f"Issued archers: {count_archer_p1}", 1, (255, 255, 255))
+        ready_archers_label_1 = default_font.render(f"Ready Archers: {num_archer_p1}", 1, (255, 0, 255))
+        ready_swordsmen_label_1 = default_font.render(f"| Ready Swordsmen: {num_swordsmen_p1}", 1, (255, 0, 255))
+        archers_in_training_1 = default_font.render(f"Issued archers: {count_archer_p1}", 1, (255, 0, 255))
+        swordsmen_in_training_1 = default_font.render(f"Issued swordsmen: {count_swordsmen_p1}", 1, (255, 0, 255))
         player1_resource_label = resource_font.render(f"Resource: {player1_resource}", 1, (255, 0, 0))
-        tot_soldiers_p1_label = default_font.render(f"Total number of soldiers: {len(archers_p1) + len(swordsmen_p1)}", 1,(255, 255, 255))
+        tot_soldiers_p1_label = default_font.render(f"Total number of soldiers: {len(archers_p1) + len(swordsmen_p1)}",
+                                                    1, (255, 255, 255))
+
         screen.blit(player1_resource_label, (10, 5))
         screen.blit(ready_archers_label_1, (10, 30))
+        screen.blit(ready_swordsmen_label_1, (ready_archers_label_1.get_width() + 15, 30))
         screen.blit(archers_in_training_1, (10, 40))
-        screen.blit(tot_soldiers_p1_label, (10, 50))
+        screen.blit(swordsmen_in_training_1, (archers_in_training_1.get_width() + 15, 40))
+        screen.blit(tot_soldiers_p1_label, (10, 60))
+
         for i in range(len(archers_p1)):
             if archers_p1[i].ready_to_dispatch:
                 archers_p1[i].draw(screen)
-            if archer.x > WIDTH - 100:
+            if archers_p1[i].x > WIDTH - 100:
                 archers_p1.remove(archers_p1[i])
             if archers_p1[i].dead:
                 archers_p1.remove(archers_p1[i])
 
-        for swordsman in swordsmen_p1:
-            if swordsman.ready_to_dispatch:
-                swordsman.draw(screen)
-            if swordsman.x > WIDTH - 100:
-                swordsmen_p1.remove(swordsman)
+        for i in range(len(swordsmen_p1)):
+            if swordsmen_p1[i].ready_to_dispatch:
+                swordsmen_p1[i].draw(screen)
+            if swordsmen_p1[i].x > WIDTH - 100:
+                swordsmen_p1.remove(swordsmen_p1[i])
+            if swordsmen_p1[i].dead:
+                swordsmen_p1.remove(swordsmen_p1[i])
 
         pg.display.update()
+
+    def check_added(soldiers, num_soldiers, count_soldiers):
+        if isinstance(soldiers, list):
+            for i in range(len(soldiers)):
+                if isinstance(soldiers[i], Archer):
+                    if soldiers[i].ready_to_dispatch and soldiers[i].archer_added is False:
+                        num_soldiers += 1
+                        soldiers[i].archer_added = True
+                        count_soldiers -= 1
+                elif isinstance(soldiers[i], SwordMan):
+                    if soldiers[i].ready_to_dispatch and soldiers[i].swordsman_added is False:
+                        num_soldiers += 1
+                        soldiers[i].swordsman_added = True
+                        count_soldiers -= 1
+        return num_soldiers, count_soldiers
+
+    def add_to_queue(soldiers, count_soldiers, type):
+        if isinstance(soldiers, list):
+            for i in range(count_soldiers):
+                match type:
+                    case "archers_p1":
+                        soldier = Archer(100, random.randrange(10, 30), 165, False, screen,
+                                         "sprites/player1/bow/run/run-", ".png")
+                        if len(soldiers) >= 1:
+                            prev_soldier = soldiers[len(soldiers) - 1]
+                            if prev_soldier.ready_to_dispatch:
+                                soldiers.append(soldier)
+                        elif len(soldiers) == 0:
+                            soldiers.append(soldier)
+                    case "swordsmen_p1":
+                        soldier = SwordMan(100, random.randrange(10, 30), 170, False, screen,
+                                           "sprites/player1/sword/run/run-",
+                                           ".png")
+                        if len(soldiers) >= 1:
+                            prev_soldier = soldiers[len(soldiers) - 1]
+                            if prev_soldier.ready_to_dispatch:
+                                soldiers.append(soldier)
+                        elif len(soldiers) == 0:
+                            soldiers.append(soldier)
 
     loop = 1
 
@@ -96,7 +143,9 @@ def main():
 
         clock.tick(24)
         redraw_window()
+
         for event in pg.event.get():
+
             if event.type == pg.QUIT:
                 loop = 0
             if event.type == pg.KEYDOWN:
@@ -105,6 +154,7 @@ def main():
                     if player1_resource >= 0:
                         player1_resource -= Archer.COST
                         count_archer_p1 += 1
+
                     else:
                         player1_resource = 0
 
@@ -118,61 +168,35 @@ def main():
                 if event.key == pg.K_f:
                     if num_archer_p1 > 0:
                         archer_index_p1, num_archer_p1 = attack(archers_p1, archer_index_p1, num_archer_p1)
-                #
-                # if event.key == pg.K_d:
-                #         swordsman_index_p1, num_swordsmen_p1 = attack(swordsmen_p1, swordsman_index_p1,
-                #                                                       num_swordsmen_p1)
+
+                if event.key == pg.K_d:
+                    if num_archer_p1 > 0:
+                        swordsman_index_p1, num_swordsmen_p1 = attack(swordsmen_p1, swordsman_index_p1,
+                                                                      num_swordsmen_p1)
 
                 if event.key == pg.K_z:
                     deploy_all(archers_p1)
-                    # deploy_all(swordsmen_p1)
+                    deploy_all(swordsmen_p1)
                     num_archer_p1 = 0
-                    # num_swordsmen_p1 = 0
-        for i in range(len(archers_p1)):
-            if archers_p1[i].ready_to_dispatch and archers_p1[i].archer_added is False:
-                num_archer_p1 += 1
-                archers_p1[i].archer_added = True
+                    num_swordsmen_p1 = 0
 
-        for i in range(count_archer_p1):
-            archer = Archer(100, random.randrange(10, 30), 165, False, screen, "sprites/player1/bow/run/run-", ".png")
-            if len(archers_p1) >= 1:
-                prev_archer = archers_p1[len(archers_p1) - 1]
-                if prev_archer.ready_to_dispatch:
-                    archers_p1.append(archer)
-                    count_archer_p1 -= 1
+        add_to_queue(archers_p1, count_archer_p1, "archers_p1")
+        # add_to_queue(swordsmen_p1, count_swordsmen_p1, "swordsmen_p1")
 
-            elif len(archers_p1) == 0:
-                count_archer_p1 -= 1
-                archers_p1.append(archer)
+        if count_archer_p1 <= 0:
+            count_archer_p1 = 0
+        if count_swordsmen_p1 <= 0:
+            count_swordsmen_p1 = 0
 
-        for i in range(count_swordsmen_p1):
-            swordsman = SwordMan(100, random.randrange(10, 30), 165, False, screen)
-            if len(swordsmen_p1) >= 1:
-                prev_swordsman = swordsmen_p1[len(swordsmen_p1) - 1]
-                if prev_swordsman.ready_to_dispatch:
-                    swordsmen_p1.append(swordsman)
-                    num_swordsmen_p1 += 1
-                    count_swordsmen_p1 -= 1
-            elif len(swordsmen_p1) == 0:
-                num_swordsmen_p1 += 1
-                swordsmen_p1.append(swordsman)
+        num_archer_p1, count_archer_p1 = check_added(archers_p1, num_archer_p1, count_archer_p1)
+        num_swordsmen_p1, count_swordsmen_p1 = check_added(swordsmen_p1, num_swordsmen_p1, count_swordsmen_p1)
 
         for i in range(len(archers_p1)):
             if archers_p1[i].ready_to_dispatch is False:
                 archers_p1[i].train()
-        # for swordsman in swordsmen_p1:
-        #     if swordsman.ready_to_dispatch is False:
-        #         swordsman.train()
-
-        if count_archer_p1 <= 0:
-            count_archer_p1 = 0
-        # if count_swordsmen_p1 <= 0:
-        #     count_swordsmen_p1 = 0
-
-        print("issued archers: " + str(count_archer_p1) + " no. of archers: " + str(len(archers_p1)) + " index: " + str(
-            archer_index_p1) + " ready archers: " + str(num_archer_p1) + " | "
-              + "issued swordsman: " + str(count_swordsmen_p1) + " no. of swordsmen: " + str(
-            len(swordsmen_p1)) + " index: " + str(swordsman_index_p1) + " resources: " + str(player1_resource))
+        for i in range(len(swordsmen_p1)):
+            if swordsmen_p1[i].ready_to_dispatch is False:
+                swordsmen_p1[i].train()
 
         for i in range(len(archers_p1)):
             # if soldier is dispatchable it gets deployed
@@ -180,11 +204,13 @@ def main():
                 archers_p1[i].move()
                 archers_p1[i].update()
             in_range(archers_p1[i])
-        # for swordsman in swordsmen_p1:
-        #     # if soldier is dispatchable it gets deployed
-        #     if swordsman.attack:
-        #         swordsman.move()
-        #         swordsman.update()
+
+        for i in range(len(swordsmen_p1)):
+            # if soldier is dispatchable it gets deployed
+            if swordsmen_p1[i].deploy and swordsmen_p1[i].run:
+                swordsmen_p1[i].move()
+                swordsmen_p1[i].update()
+            # in_range(swordsmen_p1[i])
 
 
 if __name__ == '__main__':

@@ -12,26 +12,30 @@ class SwordMan(Player, pg.sprite.Sprite):
     COST = 10
     SPEED = 5
 
-    def __init__(self, health, x, y, attack, screen):
-        super().__init__(health, x, y, attack)
+    def __init__(self, health, x, y, deploy, screen, image_path_root, img_extension):
+        super().__init__(health, x, y, deploy)
         self.a_count = 0
         self.turns = 0
         self.current_time = 0
+        self.start_shoot = 0
+        self.swordsman_added = False
+        self.run = False
         self.dead = False
-        self.attack = False
+        self.deploy = False
         self.ready_to_dispatch = False
-        self.animation = self.loadImage()
+        self.animation = self.loadImage(image_path_root, img_extension, 11)
         self.start_time = time.time()
         self.screen = screen
         self.rect = self.image.get_rect()
         self.image = pg.image.load("sprites/player1/sword/ready.png")
 
-    def loadImage(self):
+    def loadImage(self, image_path_root, img_extension, num_img):
         images = {}
-        for i in range(11):
-            self.image = pg.image.load("sprites/player1/sword/run/run-" + str(i) + ".png")
+        for i in range(num_img):
+            self.image = pg.image.load(image_path_root + str(i) + img_extension)
             images[i] = self.image
         return images
+
     #     modified
     def update(self):
         self.a_count += 1
@@ -43,7 +47,8 @@ class SwordMan(Player, pg.sprite.Sprite):
         screen.blit(self.image, (self.x, self.y))
 
     def move(self):
-        self.x += self.SPEED
+        if self.run:
+            self.x += self.SPEED
 
     def train(self):
         print("training sword")
@@ -54,3 +59,11 @@ class SwordMan(Player, pg.sprite.Sprite):
         else:
             print("ready ready sword")
             self.ready_to_dispatch = True
+
+    def rest(self):
+        if self.REST > (self.current_time - self.start_shoot):
+            self.current_time = time.time()
+            # print("rest timer: " + str(self.current_time - self.start_shoot))
+            return False
+        else:
+            return True
