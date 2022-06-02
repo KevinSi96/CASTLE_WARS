@@ -32,14 +32,14 @@ def check_added(soldiers, num_soldiers, count_soldiers, type, total):
             match type:
                 case "archers_p1":
                     if isinstance(soldiers[i], Archer):
-                        if soldiers[i].ready_to_dispatch and soldiers[i].archer_added is False:
+                        if soldiers[i].ready_to_dispatch and not soldiers[i].archer_added:
                             soldiers[i].archer_added = True
                             num_soldiers += 1
                             count_soldiers -= 1
                             total += 1
                 case "swordsmen_p1":
                     if isinstance(soldiers[i], SwordMan):
-                        if soldiers[i].ready_to_dispatch and soldiers[i].swordsman_added is False:
+                        if soldiers[i].ready_to_dispatch and not soldiers[i].swordsman_added:
                             soldiers[i].swordsman_added = True
                             num_soldiers += 1
                             count_soldiers -= 1

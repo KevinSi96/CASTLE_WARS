@@ -10,7 +10,7 @@ class Archer(Player, pg.sprite.Sprite):
     TRAIN_TURNS = 3
     RANGE = 10
     HIT_DAMAGE = 3
-    REST = 2
+    REST = 3
     COST = 3
     SPEED = 5
     PLAYER1_READY = "sprites/player1/bow/ready.png"
@@ -20,7 +20,6 @@ class Archer(Player, pg.sprite.Sprite):
 
     def __init__(self, health, x, y, deploy, screen, image_path_root, img_extension):
         super().__init__(health, x, y, deploy)
-        self.rest_amount = 0
         self.shoot_count = 0
         self.a_count = 0
         self.current_time = 0
@@ -64,14 +63,16 @@ class Archer(Player, pg.sprite.Sprite):
     def update(self):
         if self.a_count == len(self.animation):
             self.a_count = 0
-        self.image = self.animation[self.a_count]
+
         if self.shooting:
-            if self.rest():
-                self.a_count += 1
+            if self.rest(self.REST):
+                self.image = self.animation[1]
                 self.start_shoot = time.time()
-            else:
+            elif self.rest(1):
                 self.image = self.animation[0]
+
         else:
+            self.image = self.animation[self.a_count]
             self.a_count += 1
 
     def draw(self, screen):
@@ -84,8 +85,8 @@ class Archer(Player, pg.sprite.Sprite):
     def shoot(self, image_path_root, img_extension):
         self.animation = self.loadImage(image_path_root, img_extension, 2)
 
-    def rest(self):
-        if self.rest_amount > (self.current_time - self.start_shoot):
+    def rest(self, rest_amount):
+        if rest_amount > (self.current_time - self.start_shoot):
             self.current_time = time.time()
             return False
         else:
