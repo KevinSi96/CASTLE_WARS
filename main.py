@@ -151,6 +151,8 @@ def main():
                 if archers_p1[i].run:
                     archers_p1[i].move()
                 archers_p1[i].update()
+                if archers_p1[i].shooting:
+                    archers_p1[i].move_arrows()
             in_range(archers_p1[i])
 
         for i in range(len(swordsmen_p1)):

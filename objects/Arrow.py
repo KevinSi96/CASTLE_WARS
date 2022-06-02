@@ -1,6 +1,6 @@
 import pygame as pg
 
-from implementable.Functions import collide
+from implementable import Functions
 
 
 class Arrow(pg.sprite.Sprite):
@@ -40,5 +40,5 @@ class Arrow(pg.sprite.Sprite):
     def draw_arrows(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
-    def collision(self, obj):
-        return collide(obj, self)
+    # def collision(self, obj):
+    #     return Functions.collide(obj, self)

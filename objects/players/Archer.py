@@ -3,6 +3,7 @@ import time
 
 import pygame as pg
 
+from objects.Arrow import Arrow
 from objects.players.Player import Player
 
 
@@ -30,6 +31,7 @@ class Archer(Player, pg.sprite.Sprite):
         self.run = False
         self.dead = False
         self.deploy = False
+        self.player = None
         self.ready_to_dispatch = False
         self.animation = self.loadImage(image_path_root, img_extension, 11)
         self.start_time = time.time()
@@ -43,15 +45,18 @@ class Archer(Player, pg.sprite.Sprite):
             match player:
                 case "p1":
                     self.image = pg.image.load(self.PLAYER1_READY)
+                    self.player = "p1"
                     if not self.shooting:
                         self.shooting = True
                         self.a_count = 0
                         self.load_shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
                 case "p2":
+                    self.image = pg.image.load(self.PLAYER2_READY)
+                    self.player = "p2"
                     if not self.shooting:
-                        self.image = pg.image.load(self.PLAYER2_READY)
                         self.shooting = True
-                        self.load_shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
+                        self.a_count = 0
+                        self.load_shoot(self.PLAYER2_SHOOT[0], self.PLAYER2_SHOOT[1])
 
     def loadImage(self, image_path_root, img_extension, num_img):
         images = {}
@@ -66,6 +71,15 @@ class Archer(Player, pg.sprite.Sprite):
 
         if self.shooting:
             if self.rest(self.REST):
+                match self.player:
+                    case "p1":
+                        arrow = Arrow(self.x, self.y+5, "sprites/player1/bow/arrow_hor/arrowhor-", ".png")
+                        arrow.shoot = True
+                        self.arrows.append(arrow)
+                    case "p2":
+                        arrow = Arrow(self.x, self.y + 5, "sprites/player2/bow/arrow_hor/arrowhor-", ".png")
+                        arrow.shoot = True
+                        self.arrows.append(arrow)
                 self.image = self.animation[1]
                 self.start_shoot = time.time()
             elif self.rest(1):
@@ -77,10 +91,16 @@ class Archer(Player, pg.sprite.Sprite):
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
+        for arrow in self.arrows:
+            arrow.draw_arrows(screen)
 
     def move(self):
         if self.run:
             self.x += self.SPEED
+
+    def move_arrows(self):
+        for arrow in self.arrows:
+            arrow.move_arrow(self.player)
 
     def load_shoot(self, image_path_root, img_extension):
         self.animation = self.loadImage(image_path_root, img_extension, 2)
