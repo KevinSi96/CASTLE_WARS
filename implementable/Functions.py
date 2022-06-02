@@ -21,7 +21,7 @@ def attack(soldiers, soldier_index, soldier_counter):
 def deploy_all(soldiers):
     if isinstance(soldiers, list):
         for soldier in soldiers:
-            if soldier.run is False and soldier.deploy is False:
+            if not soldier.run and not soldier.deploy:
                 soldier.deploy = True
                 soldier.run = True
 
