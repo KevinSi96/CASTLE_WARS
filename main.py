@@ -32,7 +32,7 @@ def main():
     p1_total_soldiers = 0
 
     # Fonts
-    default_font = pg.font.SysFont("comicsans", 10)
+    default_font = pg.font.SysFont("comicsans", 12)
     resource_font = pg.font.SysFont("comicsans", 20)
 
     def in_range(object1):
@@ -48,16 +48,16 @@ def main():
         ready_archers_label_1 = default_font.render(f"Ready Archers: {num_archer_p1}", True, (255, 0, 255))
         ready_swordsmen_label_1 = default_font.render(f"| Ready Swordsmen: {num_swordsmen_p1}", True, (255, 0, 255))
         archers_in_training_1 = default_font.render(f"Issued archers: {count_archer_p1}", True, (255, 0, 255))
-        swordsmen_in_training_1 = default_font.render(f"Issued swordsmen: {count_swordsmen_p1}", True, (255, 0, 255))
+        swordsmen_in_training_1 = default_font.render(f"| Issued swordsmen: {count_swordsmen_p1}", True, (255, 0, 255))
         player1_resource_label = resource_font.render(f"Resource: {player1_resource}", True, (255, 0, 0))
         tot_soldiers_p1_label = default_font.render(f"Total number of soldiers: {len(archers_p1) + len(swordsmen_p1)}",
-                                                    1, (255, 255, 255))
+                                                    1, (0, 0, 0))
 
         screen.blit(player1_resource_label, (10, 5))
-        screen.blit(ready_archers_label_1, (10, 30))
-        screen.blit(ready_swordsmen_label_1, (ready_archers_label_1.get_width() + 15, 30))
-        screen.blit(archers_in_training_1, (10, 40))
-        screen.blit(swordsmen_in_training_1, (archers_in_training_1.get_width() + 15, 40))
+        screen.blit(ready_archers_label_1, (10, 35))
+        screen.blit(ready_swordsmen_label_1, (ready_archers_label_1.get_width() + 15, 35))
+        screen.blit(archers_in_training_1, (10, 45))
+        screen.blit(swordsmen_in_training_1, (archers_in_training_1.get_width() + 15, 45))
         screen.blit(tot_soldiers_p1_label, (10, 60))
 
         for i in range(len(archers_p1)):

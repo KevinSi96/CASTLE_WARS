@@ -25,6 +25,7 @@ class Archer(Player, pg.sprite.Sprite):
         self.current_time = 0
         self.start_shoot = 0
         self.archer_added = False
+        self.arrows = []
         self.shooting = False
         self.run = False
         self.dead = False
@@ -45,13 +46,12 @@ class Archer(Player, pg.sprite.Sprite):
                     if not self.shooting:
                         self.shooting = True
                         self.a_count = 0
-                        self.shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
-                        self.rest_amount = self.REST
+                        self.load_shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
                 case "p2":
                     if not self.shooting:
                         self.image = pg.image.load(self.PLAYER2_READY)
                         self.shooting = True
-                        self.shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
+                        self.load_shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
 
     def loadImage(self, image_path_root, img_extension, num_img):
         images = {}
@@ -82,7 +82,7 @@ class Archer(Player, pg.sprite.Sprite):
         if self.run:
             self.x += self.SPEED
 
-    def shoot(self, image_path_root, img_extension):
+    def load_shoot(self, image_path_root, img_extension):
         self.animation = self.loadImage(image_path_root, img_extension, 2)
 
     def rest(self, rest_amount):
