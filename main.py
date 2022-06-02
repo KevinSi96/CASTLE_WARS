@@ -29,6 +29,7 @@ def main():
     num_archer_p1 = 0
     count_swordsmen_p1 = 0
     num_swordsmen_p1 = 0
+    p1_total_soldiers = 0
 
     # Fonts
     default_font = pg.font.SysFont("comicsans", 10)
@@ -36,20 +37,19 @@ def main():
 
     def in_range(object1):
         if isinstance(object1, Archer):
-            if object1.x >= WIDTH - (random.randint(0, 100) + 300) and object1.deploy:
+            if object1.x >= WIDTH - (random.randint(0, 100) + 700) and object1.deploy:
                 object1.run = False
-                object1.ready_to_shoot()
-                print(str(round(object1.current_time - object1.start_shoot)))
+                object1.ready_to_shoot("p1")
         return object1
 
     def redraw_window():
         screen.blit(BG, (0, 0))
 
-        ready_archers_label_1 = default_font.render(f"Ready Archers: {num_archer_p1}", 1, (255, 0, 255))
-        ready_swordsmen_label_1 = default_font.render(f"| Ready Swordsmen: {num_swordsmen_p1}", 1, (255, 0, 255))
-        archers_in_training_1 = default_font.render(f"Issued archers: {count_archer_p1}", 1, (255, 0, 255))
-        swordsmen_in_training_1 = default_font.render(f"Issued swordsmen: {count_swordsmen_p1}", 1, (255, 0, 255))
-        player1_resource_label = resource_font.render(f"Resource: {player1_resource}", 1, (255, 0, 0))
+        ready_archers_label_1 = default_font.render(f"Ready Archers: {num_archer_p1}", True, (255, 0, 255))
+        ready_swordsmen_label_1 = default_font.render(f"| Ready Swordsmen: {num_swordsmen_p1}", True, (255, 0, 255))
+        archers_in_training_1 = default_font.render(f"Issued archers: {count_archer_p1}", True, (255, 0, 255))
+        swordsmen_in_training_1 = default_font.render(f"Issued swordsmen: {count_swordsmen_p1}", True, (255, 0, 255))
+        player1_resource_label = resource_font.render(f"Resource: {player1_resource}", True, (255, 0, 0))
         tot_soldiers_p1_label = default_font.render(f"Total number of soldiers: {len(archers_p1) + len(swordsmen_p1)}",
                                                     1, (255, 255, 255))
 
@@ -111,7 +111,7 @@ def main():
                         archer_index_p1, num_archer_p1 = Functions.attack(archers_p1, archer_index_p1, num_archer_p1)
 
                 if event.key == pg.K_d:
-                    if num_archer_p1 > 0:
+                    if num_swordsmen_p1 > 0:
                         swordsman_index_p1, num_swordsmen_p1 = Functions.attack(swordsmen_p1, swordsman_index_p1,
                                                                                 num_swordsmen_p1)
 
@@ -122,11 +122,15 @@ def main():
                     num_swordsmen_p1 = 0
 
         Functions.add_to_queue(archers_p1, count_archer_p1, "archers_p1", screen)
-        num_archer_p1, count_archer_p1 = Functions.check_added(archers_p1, num_archer_p1, count_archer_p1, "archers_p1")
+        num_archer_p1, count_archer_p1, total_archer_p1 = Functions.check_added(archers_p1, num_archer_p1,
+                                                                                count_archer_p1, "archers_p1",
+                                                                                p1_total_soldiers)
 
         Functions.add_to_queue(swordsmen_p1, count_swordsmen_p1, "swordsmen_p1", screen)
-        num_swordsmen_p1, count_swordsmen_p1 = Functions.check_added(swordsmen_p1, num_swordsmen_p1, count_swordsmen_p1,
-                                                                     "swordsmen_p1")
+        num_swordsmen_p1, count_swordsmen_p1, p1_total_soldiers = Functions.check_added(swordsmen_p1, num_swordsmen_p1,
+                                                                                        count_swordsmen_p1,
+                                                                                        "swordsmen_p1",
+                                                                                        p1_total_soldiers)
 
         if count_archer_p1 <= 0:
             count_archer_p1 = 0
@@ -142,8 +146,9 @@ def main():
 
         for i in range(len(archers_p1)):
             # if soldier is dispatchable it gets deployed
-            if archers_p1[i].deploy and archers_p1[i].run:
-                archers_p1[i].move()
+            if archers_p1[i].deploy:
+                if archers_p1[i].run:
+                    archers_p1[i].move()
                 archers_p1[i].update()
             in_range(archers_p1[i])
 

@@ -13,14 +13,20 @@ class Archer(Player, pg.sprite.Sprite):
     REST = 2
     COST = 3
     SPEED = 5
+    PLAYER1_READY = "sprites/player1/bow/ready.png"
+    PLAYER1_SHOOT = ["sprites/player1/bow/shoot/shoot-", ".png"]
+    PLAYER2_READY = "sprites/player2/bow/ready.png"
+    PLAYER2_SHOOT = ["sprites/player2/bow/shoot/shoot-", ".png"]
 
     def __init__(self, health, x, y, deploy, screen, image_path_root, img_extension):
         super().__init__(health, x, y, deploy)
+        self.rest_amount = 0
         self.shoot_count = 0
         self.a_count = 0
         self.current_time = 0
         self.start_shoot = 0
         self.archer_added = False
+        self.shooting = False
         self.run = False
         self.dead = False
         self.deploy = False
@@ -30,14 +36,23 @@ class Archer(Player, pg.sprite.Sprite):
         self.screen = screen
         self.rect = self.image.get_rect()
 
-    def ready_to_shoot(self):
-        if self.run is False and self.shoot_count == 0:
+    def ready_to_shoot(self, player):
+        if not self.run and self.shoot_count == 0:
             self.start_shoot = time.time()
             self.shoot_count += 1
-        self.image = pg.image.load("sprites/player1/bow/ready.png")
-        if self.rest():
-            self.shoot()
-            self.shoot_count = 0
+            match player:
+                case "p1":
+                    self.image = pg.image.load(self.PLAYER1_READY)
+                    if not self.shooting:
+                        self.shooting = True
+                        self.a_count = 0
+                        self.shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
+                        self.rest_amount = self.REST
+                case "p2":
+                    if not self.shooting:
+                        self.image = pg.image.load(self.PLAYER2_READY)
+                        self.shooting = True
+                        self.shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
 
     def loadImage(self, image_path_root, img_extension, num_img):
         images = {}
@@ -47,10 +62,17 @@ class Archer(Player, pg.sprite.Sprite):
         return images
 
     def update(self):
-        self.a_count += 1
         if self.a_count == len(self.animation):
             self.a_count = 0
         self.image = self.animation[self.a_count]
+        if self.shooting:
+            if self.rest():
+                self.a_count += 1
+                self.start_shoot = time.time()
+            else:
+                self.image = self.animation[0]
+        else:
+            self.a_count += 1
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
@@ -59,13 +81,12 @@ class Archer(Player, pg.sprite.Sprite):
         if self.run:
             self.x += self.SPEED
 
-    def shoot(self):
-        self.animation = self.loadImage("sprites/player1/bow/shoot/shoot-", ".png", 2)
+    def shoot(self, image_path_root, img_extension):
+        self.animation = self.loadImage(image_path_root, img_extension, 2)
 
     def rest(self):
-        if self.REST > (self.current_time - self.start_shoot):
+        if self.rest_amount > (self.current_time - self.start_shoot):
             self.current_time = time.time()
-            # print("rest timer: " + str(self.current_time - self.start_shoot))
             return False
         else:
             return True
@@ -75,5 +96,8 @@ class Archer(Player, pg.sprite.Sprite):
             self.current_time = time.time()
         else:
             self.ready_to_dispatch = True
+
+    def falling(self, image_path_root, img_extension, num_img):
+        self.animation = self.loadImage(image_path_root, img_extension, 6)
     # we set ready to dispatch once the training time is done, then in the main when the dispatch order is issued, the dispatch variable gets set to True
     # and the soldiers gets deployed into the battle field
