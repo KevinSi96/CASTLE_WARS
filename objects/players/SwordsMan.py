@@ -19,10 +19,6 @@ class SwordMan(Player, pg.sprite.Sprite):
         self.current_time = 0
         self.start_shoot = 0
         self.swordsman_added = False
-        self.run = False
-        self.dead = False
-        self.deploy = False
-        self.ready_to_dispatch = False
         self.animation = self.loadImage(image_path_root, img_extension, 11)
         self.start_time = time.time()
         self.screen = screen

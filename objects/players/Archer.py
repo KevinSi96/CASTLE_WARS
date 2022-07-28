@@ -7,7 +7,7 @@ from objects.Arrow import Arrow
 from objects.players.Player import Player
 
 
-class Archer(Player, pg.sprite.Sprite):
+class Archer(Player):
     TRAIN_TURNS = 3
     RANGE = 10
     HIT_DAMAGE = 3
@@ -15,25 +15,28 @@ class Archer(Player, pg.sprite.Sprite):
     COST = 3
     SPEED = 5
     PLAYER1_READY = "sprites/player1/bow/ready.png"
-    PLAYER1_SHOOT = ["sprites/player1/bow/shoot/shoot-", ".png"]
     PLAYER2_READY = "sprites/player2/bow/ready.png"
-    PLAYER2_SHOOT = ["sprites/player2/bow/shoot/shoot-", ".png"]
+    PLAYER1_RUN = {"root": "sprites/player1/bow/run/run-", "extension": ".png"}
+    PLAYER2_RUN = {"root": "sprites/player2/bow/run/run-", "extension": ".png"}
+    PLAYER1_SHOOT = {"root": "sprites/player1/bow/shoot/shoot-", "extension": ".png"}
+    PLAYER2_SHOOT = {"root": "sprites/player2/bow/shoot/shoot-", "extension": ".png"}
 
-    def __init__(self, health, x, y, deploy, screen, image_path_root, img_extension):
+    def __init__(self, health, x, y, deploy, screen, type):
         super().__init__(health, x, y, deploy)
         self.shoot_count = 0
         self.a_count = 0
         self.current_time = 0
         self.start_shoot = 0
         self.archer_added = False
+        self.type = type
         self.arrows = []
         self.shooting = False
-        self.run = False
-        self.dead = False
-        self.deploy = False
-        self.player = None
-        self.ready_to_dispatch = False
-        self.animation = self.loadImage(image_path_root, img_extension, 11)
+
+        match type:
+            case "p1":
+                self.animation = self.loadImage(self.PLAYER1_RUN.get("root"), self.PLAYER1_RUN.get("extension"), 11)
+            case "p2":
+                self.animation = self.loadImage(self.PLAYER2_RUN.get("root"), self.PLAYER2_RUN.get("extension"), 11)
         self.start_time = time.time()
         self.screen = screen
         self.rect = self.image.get_rect()
@@ -45,18 +48,16 @@ class Archer(Player, pg.sprite.Sprite):
             match player:
                 case "p1":
                     self.image = pg.image.load(self.PLAYER1_READY)
-                    self.player = "p1"
                     if not self.shooting:
                         self.shooting = True
                         self.a_count = 0
-                        self.load_shoot(self.PLAYER1_SHOOT[0], self.PLAYER1_SHOOT[1])
+                        self.load_shoot(self.PLAYER1_SHOOT.get("root"), self.PLAYER1_SHOOT.get("extension"))
                 case "p2":
                     self.image = pg.image.load(self.PLAYER2_READY)
-                    self.player = "p2"
                     if not self.shooting:
                         self.shooting = True
                         self.a_count = 0
-                        self.load_shoot(self.PLAYER2_SHOOT[0], self.PLAYER2_SHOOT[1])
+                        self.load_shoot(self.PLAYER2_SHOOT.get("root"), self.PLAYER2_SHOOT.get("extension"))
 
     def loadImage(self, image_path_root, img_extension, num_img):
         images = {}
@@ -68,12 +69,11 @@ class Archer(Player, pg.sprite.Sprite):
     def update(self):
         if self.a_count == len(self.animation):
             self.a_count = 0
-
         if self.shooting:
             if self.rest(self.REST):
-                match self.player:
+                match self.type:
                     case "p1":
-                        arrow = Arrow(self.x, self.y+5, "sprites/player1/bow/arrow_hor/arrowhor-", ".png")
+                        arrow = Arrow(self.x, self.y + 5, "sprites/player1/bow/arrow_hor/arrowhor-", ".png")
                         arrow.shoot = True
                         self.arrows.append(arrow)
                     case "p2":
@@ -96,11 +96,15 @@ class Archer(Player, pg.sprite.Sprite):
 
     def move(self):
         if self.run:
-            self.x += self.SPEED
+            match self.type:
+                case "p1":
+                    self.x += self.SPEED
+                case "p2":
+                    self.x -= self.SPEED
 
     def move_arrows(self):
         for arrow in self.arrows:
-            arrow.move_arrow(self.player)
+            arrow.move_arrow(self.type)
 
     def load_shoot(self, image_path_root, img_extension):
         self.animation = self.loadImage(image_path_root, img_extension, 2)
