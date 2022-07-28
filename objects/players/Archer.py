@@ -11,7 +11,7 @@ class Archer(Player):
     TRAIN_TURNS = 3
     RANGE = 10
     HIT_DAMAGE = 3
-    REST = 3
+    REST = 2
     COST = 3
     SPEED = 5
     PLAYER1_READY = "sprites/player1/bow/ready.png"
@@ -23,8 +23,6 @@ class Archer(Player):
 
     def __init__(self, health, x, y, deploy, screen, type):
         super().__init__(health, x, y, deploy)
-        self.shoot_count = 0
-        self.a_count = 0
         self.current_time = 0
         self.start_shoot = 0
         self.archer_added = False
@@ -41,9 +39,8 @@ class Archer(Player):
         self.rect = self.image.get_rect()
 
     def ready_to_shoot(self, player):
-        if not self.run and self.shoot_count == 0:
+        if not self.run and not self.shooting:
             self.start_shoot = time.time()
-            self.shoot_count += 1
             match player:
                 case "p1":
                     self.image = pg.image.load(self.PLAYER1_READY)

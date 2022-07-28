@@ -44,19 +44,6 @@ def main():
     default_font = pg.font.SysFont("comicsans", 12)
     resource_font = pg.font.SysFont("comicsans", 20)
 
-    def in_range(object1):
-        if isinstance(object1, Archer):
-            match object1.type:
-                case "p1":
-                    if object1.x >= WIDTH - (random.randint(0, 100) + 700) and object1.deploy:
-                        object1.run = False
-                        object1.ready_to_shoot("p1")
-                case "p2":
-                    if object1.x <= 0 + (300 - random.randint(0, 100)) and object1.deploy:
-                        object1.run = False
-                        object1.ready_to_shoot("p2")
-        return object1
-
     def redraw_window():
         screen.blit(BG, (0, 0))
 
@@ -83,11 +70,13 @@ def main():
         screen.blit(tot_soldiers_p1_label, (10, 60))
 
         screen.blit(player2_resource_label, (WIDTH - player2_resource_label.get_width(), 5))
-        screen.blit(ready_archers_label_2, (WIDTH - ready_archers_label_2.get_width(), 35))
-        screen.blit(ready_swordsmen_label_2, (WIDTH - ready_archers_label_2.get_width() - 15, 35))
-        screen.blit(archers_in_training_2, (WIDTH - archers_in_training_2.get_width(), 45))
-        screen.blit(swordsmen_in_training_2, (WIDTH - archers_in_training_2.get_width() - 15, 45))
-        screen.blit(tot_soldiers_p2_label, (WIDTH - tot_soldiers_p2_label.get_width(), 60))
+        screen.blit(ready_archers_label_2,
+                    (WIDTH - ready_archers_label_2.get_width() - ready_swordsmen_label_2.get_width() - 5, 35))
+        screen.blit(ready_swordsmen_label_2, (WIDTH - ready_archers_label_2.get_width() - 30, 35))
+        screen.blit(archers_in_training_2,
+                    (WIDTH - archers_in_training_2.get_width() - swordsmen_in_training_2.get_width() - 5, 45))
+        screen.blit(swordsmen_in_training_2, (WIDTH - archers_in_training_2.get_width() - 30, 45))
+        screen.blit(tot_soldiers_p2_label, (WIDTH - tot_soldiers_p2_label.get_width() - 5, 60))
 
         Functions.draw(archers_p1, screen)
         Functions.draw(archers_p2, screen)
@@ -207,13 +196,6 @@ def main():
 
         Functions.collide(archers_p1, archers_p2)
         Functions.collide(swordsmen_p1, swordsmen_p2)
-
-        # for i in range(len(swordsmen_p1)):
-        #     # if soldier is dispatchable it gets deployed
-        #     if swordsmen_p1[i].deploy and swordsmen_p1[i].run:
-        #         swordsmen_p1[i].move()
-        #         swordsmen_p1[i].update()
-        #     # in_range(swordsmen_p1[i])
 
 
 if __name__ == '__main__':

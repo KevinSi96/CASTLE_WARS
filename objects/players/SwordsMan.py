@@ -24,7 +24,6 @@ class SwordMan(Player):
         self.current_time = 0
         self.start_shoot = 0
         self.attacking = False
-        self.attack_count = 0
         self.swordsman_added = False
         self.type = type
         match type:
@@ -37,8 +36,7 @@ class SwordMan(Player):
         self.rect = self.image.get_rect()
 
     def attack(self, player):
-        if not self.run and self.attack_count == 0:
-            self.attack_count += 1
+        if not self.run and not self.attacking:
             match player:
                 case "p1":
                     self.image = pg.image.load(self.PLAYER1_READY)
@@ -74,13 +72,11 @@ class SwordMan(Player):
                     self.x -= self.SPEED
 
     def train(self):
-        print("training sword")
         if round(self.current_time - self.start_time) < self.TRAIN_TURNS:
             self.current_time = time.time()
         # we set ready to dispatch once the training time is done, then in the main when the dispatch order is issued, the dispatch variable gets set to True
         # and the soldiers gets deployed into the battle field
         else:
-            print("ready ready sword")
             self.ready_to_dispatch = True
 
     def rest(self):

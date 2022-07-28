@@ -75,6 +75,7 @@ def add_to_queue(soldiers, count_soldiers, type, screen):
                             soldiers.append(soldier)
                     else:
                         soldiers.append(soldier)
+
                 case "archers_p2":
                     soldier = Archer(100, random.randrange(900, 970), 165, False, screen,
                                      "p2")
@@ -143,6 +144,7 @@ def deploy(soldiers):
                     if isinstance(soldiers[i], Archer):
                         if soldiers[i].shooting:
                             soldiers[i].move_arrows()
+
 
 def draw(soldiers, screen):
     for i in range(len(soldiers)):
