@@ -89,27 +89,10 @@ def main():
         screen.blit(swordsmen_in_training_2, (WIDTH - archers_in_training_2.get_width() - 15, 45))
         screen.blit(tot_soldiers_p2_label, (WIDTH - tot_soldiers_p2_label.get_width(), 60))
 
-        for i in range(len(archers_p1)):
-            if archers_p1[i].ready_to_dispatch:
-                archers_p1[i].draw(screen)
-            if archers_p1[i].dead:
-                archers_p1.remove(archers_p1[i])
-
-        for i in range(len(archers_p2)):
-            if archers_p2[i].ready_to_dispatch:
-                archers_p2[i].draw(screen)
-            if archers_p2[i].dead:
-                archers_p2.remove(archers_p2[i])
-
-
-
-        for i in range(len(swordsmen_p1)):
-            if swordsmen_p1[i].ready_to_dispatch:
-                swordsmen_p1[i].draw(screen)
-            if swordsmen_p1[i].x > WIDTH - 100:
-                swordsmen_p1.remove(swordsmen_p1[i])
-            if swordsmen_p1[i].dead:
-                swordsmen_p1.remove(swordsmen_p1[i])
+        Functions.draw(archers_p1, screen)
+        Functions.draw(archers_p2, screen)
+        Functions.draw(swordsmen_p1, screen)
+        Functions.draw(swordsmen_p2, screen)
 
         pg.display.update()
 
@@ -168,6 +151,10 @@ def main():
                     if num_swordsmen_p1 > 0:
                         swordsman_index_p1, num_swordsmen_p1 = Functions.attack(swordsmen_p1, swordsman_index_p1,
                                                                                 num_swordsmen_p1)
+                if event.key == pg.K_j:
+                    if num_swordsmen_p2 > 0:
+                        swordsman_index_p2, num_swordsmen_p2 = Functions.attack(swordsmen_p2, swordsman_index_p2,
+                                                                                num_swordsmen_p2)
 
                 if event.key == pg.K_z:
                     Functions.deploy_all(archers_p1)
@@ -203,6 +190,8 @@ def main():
             count_archer_p2 = 0
         if count_swordsmen_p1 <= 0:
             count_swordsmen_p1 = 0
+        if count_swordsmen_p2 <= 0:
+            count_swordsmen_p2 = 0
 
         Functions.training(archers_p1)
         Functions.training(archers_p2)
@@ -215,16 +204,16 @@ def main():
 
         Functions.deploy(swordsmen_p1)
         Functions.deploy(swordsmen_p2)
-        
+
         Functions.collide(archers_p1, archers_p2)
         Functions.collide(swordsmen_p1, swordsmen_p2)
 
-        for i in range(len(swordsmen_p1)):
-            # if soldier is dispatchable it gets deployed
-            if swordsmen_p1[i].deploy and swordsmen_p1[i].run:
-                swordsmen_p1[i].move()
-                swordsmen_p1[i].update()
-            # in_range(swordsmen_p1[i])
+        # for i in range(len(swordsmen_p1)):
+        #     # if soldier is dispatchable it gets deployed
+        #     if swordsmen_p1[i].deploy and swordsmen_p1[i].run:
+        #         swordsmen_p1[i].move()
+        #         swordsmen_p1[i].update()
+        #     # in_range(swordsmen_p1[i])
 
 
 if __name__ == '__main__':

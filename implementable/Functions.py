@@ -52,6 +52,13 @@ def check_added(soldiers, num_soldiers, count_soldiers, type, total):
                             num_soldiers += 1
                             count_soldiers -= 1
                             total += 1
+                case "swordsmen_p2":
+                    if isinstance(soldiers[i], SwordMan):
+                        if soldiers[i].ready_to_dispatch and not soldiers[i].swordsman_added:
+                            soldiers[i].swordsman_added = True
+                            num_soldiers += 1
+                            count_soldiers -= 1
+                            total += 1
     return num_soldiers, count_soldiers, total
 
 
@@ -79,8 +86,17 @@ def add_to_queue(soldiers, count_soldiers, type, screen):
                         soldiers.append(soldier)
                 case "swordsmen_p1":
                     soldier = SwordMan(100, random.randrange(10, 30), 170, False, screen,
-                                       "sprites/player1/sword/run/run-",
-                                       ".png")
+                                       "p1")
+                    if len(soldiers) > 0:
+                        prev_soldier = soldiers[len(soldiers) - 1]
+                        if prev_soldier.ready_to_dispatch and prev_soldier.swordsman_added:
+                            soldiers.append(soldier)
+                    else:
+                        soldiers.append(soldier)
+
+                case "swordsmen_p2":
+                    soldier = SwordMan(100, random.randrange(900, 970), 170, False, screen,
+                                       "p2")
                     if len(soldiers) > 0:
                         prev_soldier = soldiers[len(soldiers) - 1]
                         if prev_soldier.ready_to_dispatch and prev_soldier.swordsman_added:
@@ -103,7 +119,9 @@ def collide(soldiers1, soldiers2):
                 if isinstance(soldiers1[i], SwordMan) and isinstance(soldiers2[j], SwordMan):
                     if offset_x < 20:
                         soldiers1[i].run = False
+                        soldiers1[i].attack("p1")
                         soldiers2[j].run = False
+                        soldiers2[j].attack("p2")
 
 
 def training(soldiers):
@@ -125,3 +143,10 @@ def deploy(soldiers):
                     if isinstance(soldiers[i], Archer):
                         if soldiers[i].shooting:
                             soldiers[i].move_arrows()
+
+def draw(soldiers, screen):
+    for i in range(len(soldiers)):
+        if soldiers[i].ready_to_dispatch:
+            soldiers[i].draw(screen)
+        if soldiers[i].dead:
+            soldiers.remove(soldiers[i])

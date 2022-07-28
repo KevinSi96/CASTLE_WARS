@@ -31,7 +31,6 @@ class Archer(Player):
         self.type = type
         self.arrows = []
         self.shooting = False
-
         match type:
             case "p1":
                 self.animation = self.loadImage(self.PLAYER1_RUN.get("root"), self.PLAYER1_RUN.get("extension"), 11)
@@ -58,13 +57,6 @@ class Archer(Player):
                         self.shooting = True
                         self.a_count = 0
                         self.load_shoot(self.PLAYER2_SHOOT.get("root"), self.PLAYER2_SHOOT.get("extension"))
-
-    def loadImage(self, image_path_root, img_extension, num_img):
-        images = {}
-        for i in range(num_img):
-            self.image = pg.image.load(image_path_root + str(i) + img_extension)
-            images[i] = self.image
-        return images
 
     def update(self):
         if self.a_count == len(self.animation):
