@@ -14,7 +14,7 @@ class Arrow(pg.sprite.Sprite):
         self.y = position_Y
         self.animation = self.load_arrows(img_root, img_extension, 2)
         self.a_count = 0
-        self.mask = None
+        self.mask = pg.mask.from_surface(self.image)
 
     def load_arrows(self, img_root, img_extension, num_img):
         images = {}
@@ -39,6 +39,9 @@ class Arrow(pg.sprite.Sprite):
 
     def draw_arrows(self, screen):
         screen.blit(self.image, (self.x, self.y))
+
+    def collision(self, obj):
+        return Functions.arrow_collide(obj, self)
 
     # def collision(self, obj):
     #     return Functions.collide(obj, self)

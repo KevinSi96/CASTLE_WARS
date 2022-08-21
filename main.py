@@ -197,6 +197,12 @@ def main():
         Functions.collide(archers_p1, archers_p2)
         Functions.collide(swordsmen_p1, swordsmen_p2)
 
+        Functions.check_health(archers_p1)
+        Functions.check_health(archers_p2)
+
+        Functions.check_dead(archers_p1)
+        Functions.check_dead(archers_p2)
+
 
 if __name__ == '__main__':
     main()

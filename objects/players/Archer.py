@@ -20,6 +20,8 @@ class Archer(Player):
     PLAYER2_RUN = {"root": "sprites/player2/bow/run/run-", "extension": ".png"}
     PLAYER1_SHOOT = {"root": "sprites/player1/bow/shoot/shoot-", "extension": ".png"}
     PLAYER2_SHOOT = {"root": "sprites/player2/bow/shoot/shoot-", "extension": ".png"}
+    PLAYER1_FALLEN = {"root": "sprites/player1/bow/fallen/fallen-", "extension": ".png"}
+    PLAYER2_FALLEN = {"root": "sprites/player2/bow/fallen/fallen-", "extension": ".png"}
 
     def __init__(self, health, x, y, deploy, screen, type):
         super().__init__(health, x, y, deploy)
@@ -37,11 +39,13 @@ class Archer(Player):
         self.start_time = time.time()
         self.screen = screen
         self.rect = self.image.get_rect()
+        self.mask = pg.mask.from_surface(self.image)
 
-    def ready_to_shoot(self, player):
+
+    def ready_to_shoot(self):
         if not self.run and not self.shooting:
             self.start_shoot = time.time()
-            match player:
+            match self.type:
                 case "p1":
                     self.image = pg.image.load(self.PLAYER1_READY)
                     if not self.shooting:
@@ -54,6 +58,14 @@ class Archer(Player):
                         self.shooting = True
                         self.a_count = 0
                         self.load_shoot(self.PLAYER2_SHOOT.get("root"), self.PLAYER2_SHOOT.get("extension"))
+
+    def load_dead(self):
+        if self.dead:
+            match self.type:
+                case "p1":
+                    self.loadImage(self.PLAYER1_FALLEN.get("root"), self.PLAYER1_FALLEN.get("extension"), 6)
+                case "p2":
+                    self.loadImage(self.PLAYER2_FALLEN.get("root"), self.PLAYER2_FALLEN.get("extension"), 6)
 
     def update(self):
         if self.a_count == len(self.animation):
@@ -91,9 +103,12 @@ class Archer(Player):
                 case "p2":
                     self.x -= self.SPEED
 
-    def move_arrows(self):
+    def move_arrows(self, obj):
         for arrow in self.arrows:
             arrow.move_arrow(self.type)
+            if arrow.collision(obj):
+                obj.health -= 10
+                self.arrows.remove(arrow)
 
     def load_shoot(self, image_path_root, img_extension):
         self.animation = self.loadImage(image_path_root, img_extension, 2)

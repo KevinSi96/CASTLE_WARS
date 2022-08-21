@@ -1,5 +1,6 @@
 import random
 
+from objects.Arrow import Arrow
 from objects.players.Player import Player
 from objects.players.Archer import Archer
 from objects.players.SwordsMan import SwordMan
@@ -67,7 +68,7 @@ def add_to_queue(soldiers, count_soldiers, type, screen):
         for i in range(count_soldiers):
             match type:
                 case "archers_p1":
-                    soldier = Archer(100, random.randrange(10, 30), 165, False, screen,
+                    soldier = Archer(40, random.randrange(10, 30), 165, False, screen,
                                      "p1")
                     if len(soldiers) > 0:
                         prev_soldier = soldiers[len(soldiers) - 1]
@@ -77,7 +78,7 @@ def add_to_queue(soldiers, count_soldiers, type, screen):
                         soldiers.append(soldier)
 
                 case "archers_p2":
-                    soldier = Archer(100, random.randrange(900, 970), 165, False, screen,
+                    soldier = Archer(40, random.randrange(900, 970), 165, False, screen,
                                      "p2")
                     if len(soldiers) > 0:
                         prev_soldier = soldiers[len(soldiers) - 1]
@@ -106,23 +107,34 @@ def add_to_queue(soldiers, count_soldiers, type, screen):
                         soldiers.append(soldier)
 
 
-def collide(soldiers1, soldiers2):
-    if isinstance(soldiers1, list) and isinstance(soldiers2, list):
-        for i in range(len(soldiers1)):
-            for j in range(len(soldiers2)):
-                offset_x = soldiers2[j].x - soldiers1[i].x
-                if isinstance(soldiers1[i], Archer) and isinstance(soldiers2[j], Archer):
+def collide(object1, object2):
+    if isinstance(object1, list) and isinstance(object2, list):
+        for i in range(len(object1)):
+            for j in range(len(object2)):
+                offset_x = object2[j].x - object1[i].x
+                if isinstance(object1[i], Archer) and isinstance(object2[j], Archer):
                     if offset_x < 300:
-                        soldiers1[i].run = False
-                        soldiers1[i].ready_to_shoot("p1")
-                        soldiers2[j].run = False
-                        soldiers2[j].ready_to_shoot("p2")
-                if isinstance(soldiers1[i], SwordMan) and isinstance(soldiers2[j], SwordMan):
+                        object1[i].run = False
+                        object1[i].ready_to_shoot()
+                        if object1[i].shooting:
+                            object1[i].move_arrows(object2[j])
+                        object2[j].run = False
+                        object2[j].ready_to_shoot()
+                        if object2[j].shooting:
+                            object2[j].move_arrows(object1[i])
+
+                if isinstance(object1[i], SwordMan) and isinstance(object2[j], SwordMan):
                     if offset_x < 20:
-                        soldiers1[i].run = False
-                        soldiers1[i].attack("p1")
-                        soldiers2[j].run = False
-                        soldiers2[j].attack("p2")
+                        object1[i].run = False
+                        object1[i].attack("p1")
+                        object2[j].run = False
+                        object2[j].attack("p2")
+
+
+def arrow_collide(object1, object2):
+    offset_x = object2.x - object1.x
+    offset_y = object2.y - object1.y
+    return object1.mask.overlap(object2.mask, (offset_x, offset_y)) != None
 
 
 def training(soldiers):
@@ -141,14 +153,27 @@ def deploy(soldiers):
                     if soldiers[i].run:
                         soldiers[i].move()
                     soldiers[i].update()
-                    if isinstance(soldiers[i], Archer):
-                        if soldiers[i].shooting:
-                            soldiers[i].move_arrows()
+                    # if isinstance(soldiers[i], Archer):
+                    #     if soldiers[i].shooting:
+                    #         soldiers[i].move_arrows()
+
+
+def check_health(soldiers):
+    for soldier in soldiers:
+        if isinstance(soldier, Archer):
+            if soldier.health < 0:
+                soldier.falling = True
+                soldier.shooting = False
+
+
+def check_dead(soldiers):
+    for i in range(len(soldiers)):
+        if isinstance(soldiers[i], Archer):
+            if soldiers[i].falling:
+                soldiers[i].load_dead()
 
 
 def draw(soldiers, screen):
     for i in range(len(soldiers)):
         if soldiers[i].ready_to_dispatch:
             soldiers[i].draw(screen)
-        if soldiers[i].dead:
-            soldiers.remove(soldiers[i])

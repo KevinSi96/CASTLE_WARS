@@ -11,6 +11,7 @@ class Player(GameObject, pg.sprite.Sprite):
         self.dispatch = dispatch
         self.run = False
         self.dead = False
+        self.falling = False
         self.deploy = False
         self.a_count = 0
         self.ready_to_dispatch = False
