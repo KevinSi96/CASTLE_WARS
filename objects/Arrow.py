@@ -1,12 +1,13 @@
 import pygame as pg
+import math
 
 from implementable import Functions
 
 
 class Arrow(pg.sprite.Sprite):
-    SPEED = 10
+    SPEED = 5
 
-    def __init__(self, position_X, position_Y, img_root, img_extension):
+    def __init__(self, position_X, position_Y, img_root, img_extension, player, angle):
         super().__init__()
         self.shoot = False
         self.hit = False
@@ -14,7 +15,9 @@ class Arrow(pg.sprite.Sprite):
         self.y = position_Y
         self.animation = self.load_arrows(img_root, img_extension, 2)
         self.a_count = 0
-        self.mask = pg.mask.from_surface(self.image)
+        self.speedX = self.SPEED * math.cos(angle) if player else -self.SPEED * math.cos(angle)
+        self.speedY = self.SPEED * math.sin(angle)
+        self.rect = self.image.get_rect(midbottom=(self.x, self.y))
 
     def load_arrows(self, img_root, img_extension, num_img):
         images = {}
@@ -24,24 +27,15 @@ class Arrow(pg.sprite.Sprite):
         return images
 
     def update_arrow(self):
+        self.a_count += 0.3
         if self.a_count == len(self.animation):
             self.a_count = 0
-        self.image = self.animation[self.a_count]
-        self.mask = pg.mask.from_surface(self.image)
+        self.image = self.animation[int(self.a_count)]
 
-    def move_arrow(self, type):
+    def move_arrow(self):
         if self.shoot and not self.hit:
-            match type:
-                case "p1":
-                    self.x += self.SPEED
-                case "p2":
-                    self.x -= self.SPEED
+            self.x += self.speedX
+            self.rect = self.image.get_rect(midbottom=(self.x, self.y))
 
     def draw_arrows(self, screen):
-        screen.blit(self.image, (self.x, self.y))
-
-    def collision(self, obj):
-        return Functions.arrow_collide(obj, self)
-
-    # def collision(self, obj):
-    #     return Functions.collide(obj, self)
+        screen.blit(self.image, self.rect)
