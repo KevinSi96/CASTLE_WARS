@@ -58,7 +58,6 @@ class Barracks:
                                                                                              "archers_p1" if self.player.player_type == "p1" else "archers_p2",
                                                                                              self.player.total_soldiers)
 
-
     def train_worker(self, player, isLeftPlayer):
         worker = Worker(player, isLeftPlayer)
         self.training_queue.append(worker)

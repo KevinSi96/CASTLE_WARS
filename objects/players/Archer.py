@@ -5,7 +5,7 @@ import pygame as pg
 from implementable import Functions
 from objects.Arrow import Arrow
 from objects.Constants import BARRACKS_POS, SCREEN_WIDTH, GROUND_HEIGHT, SCREEN_HEIGHT, ARCHER_SPEED, ARCHER_DAMAGE, \
-    ARCHER_TRAIN, ARCHER_RANGE, ARCHER_REST, ARCHER_COST
+    ARCHER_TRAIN, ARCHER_RANGE, ARCHER_REST, ARCHER_COST, ARCHER_HEALTH
 from objects.Wall import Wall
 
 
@@ -16,6 +16,7 @@ class Archer:
     REST = ARCHER_REST
     COST = ARCHER_COST
     SPEED = ARCHER_SPEED
+    MAX_HEALTH = ARCHER_HEALTH
 
     PLAYER1_READY = "sprites/player1/bow/ready.png"
     PLAYER2_READY = "sprites/player2/bow/ready.png"
@@ -27,11 +28,12 @@ class Archer:
     PLAYER2_FALLEN = {"root": "sprites/player2/bow/fallen/fallen-", "extension": ".png"}
 
     def __init__(self, player_type):
+        self.hb_width = 15
         self.target_unit = None
         self.animation = None
         self.deploy = False
         self.ready_to_dispatch = False
-        self.health = 100
+        self.health = Archer.MAX_HEALTH
         self.falling = False
         self.run = False
         self.dead = False
@@ -143,6 +145,9 @@ class Archer:
         for arrow in self.arrows:
             arrow.draw_arrows(screen)
 
+        if not self.dead and self.health < self.MAX_HEALTH:
+            self.draw_health_bar(screen)
+
     def move(self):
         if self.run:
             match self.player_type:
@@ -176,3 +181,12 @@ class Archer:
             self.current_time = time.time()
         else:
             self.ready_to_dispatch = True
+
+    def draw_health_bar(self, screen):
+        red_hb_rect = pg.Rect(self.x, self.y - 5, self.hb_width, 3)
+        red_hb_rect.center = (self.x, self.y - self.rect.h - 5)
+        pg.draw.rect(screen, (255, 0, 0), red_hb_rect)
+
+        green_hb_rect = pg.Rect(self.x, self.y - 5, self.hb_width * (self.health / self.MAX_HEALTH), 3)
+        green_hb_rect.topleft = red_hb_rect.topleft
+        pg.draw.rect(screen, (0, 255, 0), green_hb_rect)

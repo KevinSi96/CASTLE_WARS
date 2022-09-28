@@ -21,7 +21,8 @@ player1, player2 = None, None
 
 def main():
     global player1, player2
-
+    game_over = False
+    winner = None
     player1_inputs = Inputs(PLAYER1_KEY_COMMANDS)
     player2_inputs = Inputs(PLAYER2_KEY_COMMANDS)
 
@@ -34,6 +35,7 @@ def main():
     # Fonts
     default_font = pg.font.SysFont("comicsans", 12)
     resource_font = pg.font.SysFont("comicsans", 20)
+    game_over_font = pg.font.Font('font/pixel.ttf', 40)
 
     def redraw_window():
         screen.blit(BG, (0, 0))
@@ -71,9 +73,14 @@ def main():
         screen.blit(swordsmen_in_training_2, (SCREEN_WIDTH - archers_in_training_2.get_width() - 30, 45))
         screen.blit(tot_soldiers_p2_label, (SCREEN_WIDTH - tot_soldiers_p2_label.get_width() - 5, 60))
 
+        if game_over:
+            game_over_label = game_over_font.render(f"{winner} player wins", True, (0, 0, 0))
+            game_over_label_rect = game_over_label.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
+            screen.blit(game_over_label, game_over_label_rect)
         player1.draw(screen)
         player2.draw(screen)
         pg.display.update()
+
 
     loop = True
 
@@ -85,18 +92,21 @@ def main():
         for event in pg.event.get():
 
             if event.type == pg.QUIT:
-                loop = False
                 sys.exit()
             if event.type == pg.KEYDOWN:
                 player1.key_events(event.key)
                 player2.key_events(event.key)
-
-        player1.update()
-        if len(player1.soldiers) > 0:
-            if player1.soldiers[0].animation is not None:
-                print(
-                    f"{player1.soldiers[0].dead} +{player1.soldiers[0].target_unit.health if player1.soldiers[0].target_unit is not None else None} + {int(player1.soldiers[0].a_count)} + {player1.soldiers[0].health} + {len(player1.soldiers[0].animation)} + {player1.soldiers[0].attacking if isinstance(player1.soldiers[0], SwordsMan) else player1.soldiers[0].shooting}")
-        player2.update()
+        print(game_over)
+        if not game_over:
+            game_over = player1.update(game_over)
+            game_over = player2.update(game_over)
+        else:
+            player1.soldiers.clear()
+            player2.soldiers.clear()
+            if player1.castle.wall.health <= 0:
+                winner = "BLUE"
+            elif player2.castle.wall.health <= 0:
+                winner = "RED"
 
 
 if __name__ == '__main__':

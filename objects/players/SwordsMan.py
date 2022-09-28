@@ -15,6 +15,7 @@ class SwordsMan:
     REST = SWORD_REST
     COST = SWORD_COST
     SPEED = SWORD_SPEED
+    MAX_HEALTH = 100
     PLAYER1_READY = "sprites/player1/sword/ready.png"
     PLAYER2_READY = "sprites/player2/sword/ready.png"
     PLAYER1_RUN = {"root": "sprites/player1/sword/run/run-", "extension": ".png"}
@@ -25,6 +26,7 @@ class SwordsMan:
     PLAYER2_FALLEN = {"root": "sprites/player2/sword/fallen/fallen-", "extension": ".png"}
 
     def __init__(self, player_type):
+        self.hb_width = 15
         self.animation = None
         self.deploy = False
         self.ready_to_dispatch = False
@@ -122,8 +124,20 @@ class SwordsMan:
                 self.attacking = False
                 self.load_run()
 
+    def draw_health_bar(self, screen):
+        red_hb_rect = pg.Rect(self.x, self.y - 5, self.hb_width, 3)
+        red_hb_rect.center = (self.x, self.y - self.rect.h - 5)
+        pg.draw.rect(screen, (255, 0, 0), red_hb_rect)
+
+        green_hb_rect = pg.Rect(self.x, self.y - 5, self.hb_width * (self.health / self.MAX_HEALTH), 3)
+        green_hb_rect.topleft = red_hb_rect.topleft
+        pg.draw.rect(screen, (0, 255, 0), green_hb_rect)
+
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+
+        if not self.dead and self.health < self.MAX_HEALTH:
+            self.draw_health_bar(screen)
 
     def move(self):
         if self.run:
@@ -148,3 +162,4 @@ class SwordsMan:
             return False
         else:
             return True
+

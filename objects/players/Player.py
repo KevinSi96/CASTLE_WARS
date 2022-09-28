@@ -69,7 +69,7 @@ class Player:
             self.num_archer = 0
             self.num_swordsmen = 0
 
-    def update(self):
+    def update(self, game_over):
         Functions.add_to_queue(self.soldiers, self.archers, self.count_archer,
                                "archers_p1" if self.player_type == "p1" else "archers_p2")
         self.num_archer, self.count_archer, self.total_archer = Functions.check_added(self.archers, self.num_archer,
@@ -88,20 +88,20 @@ class Player:
         if self.count_sword <= 0:
             self.count_sword = 0
 
+        if self.opponent.castle.wall.health <= 0:
+            game_over = True
+            return game_over
+
         self.choose_target()
 
-        Functions.training(self.archers)
-        Functions.training(self.swordsmen)
-        Functions.deploy(self.archers)
-        Functions.deploy(self.swordsmen)
-        Functions.collide(self.archers, self.targeted_unit)
-        Functions.collide(self.swordsmen, self.targeted_unit)
+        Functions.training(self.soldiers)
+        Functions.deploy(self.soldiers)
+        Functions.collide(self.soldiers, self.targeted_unit)
         Functions.check_health(self.soldiers)
-        Functions.check_dead(self.archers)
-        Functions.check_dead(self.swordsmen)
+        Functions.check_dead(self.soldiers)
         self.castle.update(self.targeted_unit)
+        return game_over
 
     def draw(self, screen):
         self.castle.draw(screen)
-        Functions.draw(self.archers, screen)
-        Functions.draw(self.swordsmen, screen)
+        Functions.draw(self.soldiers, screen)
