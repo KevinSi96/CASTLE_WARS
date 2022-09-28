@@ -109,6 +109,8 @@ class SwordsMan:
                 if self.falling and int(self.a_count) > 4:
                     self.falling = False
                     self.dead = True
+                    self.run = False
+
                 self.image = self.animation[int(self.a_count)]
                 self.rect = self.image.get_rect(midbottom=(self.x, self.y))
                 if not self.falling:

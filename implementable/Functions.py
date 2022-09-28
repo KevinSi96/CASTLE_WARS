@@ -158,6 +158,7 @@ def check_health(soldiers):
     for i, soldier in enumerate(soldiers):
         if isinstance(soldier, (Archer, SwordsMan)):
             if soldier.health <= 0:
+                soldier.run = False
                 soldier.shooting = False
                 soldier.attacking = False
                 soldier.falling = True
