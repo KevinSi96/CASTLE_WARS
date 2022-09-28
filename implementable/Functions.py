@@ -115,17 +115,18 @@ def add_to_queue(military_unit, soldiers, count_soldiers, player_type):
 def collide(soldiers, target_unit):
     if isinstance(soldiers, list):
         for soldier in soldiers:
-            if not isinstance(target_unit, Wall):
                 if isinstance(soldier, Archer):
-                    if soldier.range.colliderect(target_unit.range):
+                    if soldier.range.colliderect(target_unit.range if not isinstance(target_unit, Wall) else target_unit.rect):
                         soldier.run = False
                         soldier.ready_to_shoot()
-                        if soldier.shooting and not target_unit.dead:
+                        if soldier.shooting:
                             soldier.move_arrows(target_unit)
                 elif isinstance(soldier, SwordsMan):
                     if soldier.rect.colliderect(target_unit.rect):
                         soldier.run = False
-                        soldier.attack(target_unit)
+                        soldier.attack()
+                        if soldier.attacking:
+                            soldier.target_unit = target_unit
 
 
 def training(soldiers):
@@ -154,12 +155,13 @@ def check_dead(soldiers):
 
 
 def check_health(soldiers):
-    for i in range(len(soldiers)):
-        if isinstance(soldiers[i], (Archer, SwordsMan)):
-            if soldiers[i].health <= 0:
-                soldiers[i].shooting = False
-                soldiers[i].load_dead()
-                soldiers[i].falling = True
+    for i, soldier in enumerate(soldiers):
+        if isinstance(soldier, (Archer, SwordsMan)):
+            if soldier.health <= 0:
+                soldier.shooting = False
+                soldier.attacking = False
+                soldier.falling = True
+                soldier.load_dead()
 
 
 def draw(soldiers, screen):

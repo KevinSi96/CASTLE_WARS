@@ -96,8 +96,9 @@ class Player:
         Functions.deploy(self.swordsmen)
         Functions.collide(self.archers, self.targeted_unit)
         Functions.collide(self.swordsmen, self.targeted_unit)
-        Functions.check_health(self.archers)
+        Functions.check_health(self.soldiers)
         Functions.check_dead(self.archers)
+        Functions.check_dead(self.swordsmen)
         self.castle.update(self.targeted_unit)
 
     def draw(self, screen):

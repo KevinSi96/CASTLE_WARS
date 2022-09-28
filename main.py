@@ -5,6 +5,7 @@ import pygame as pg
 from objects.Constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER1_KEY_COMMANDS, PLAYER2_KEY_COMMANDS
 from objects.Inputs import Inputs
 from objects.players.Player import Player
+from objects.players.SwordsMan import SwordsMan
 
 pg.init()
 
@@ -29,7 +30,6 @@ def main():
 
     player1.opponent = player2
     player2.opponent = player1
-
 
     # Fonts
     default_font = pg.font.SysFont("comicsans", 12)
@@ -92,10 +92,11 @@ def main():
                 player2.key_events(event.key)
 
         player1.update()
-        if len(player1.swordsmen) > 0:
-            print(f"{player1.swordsmen[0].run} + {len(player1.soldiers)} + {player1.targeted_unit} + {player1.swordsmen[0].health}  + {player1.swordsmen[0].animation}")
+        if len(player1.soldiers) > 0:
+            if player1.soldiers[0].animation is not None:
+                print(
+                    f"{player1.soldiers[0].dead} +{player1.soldiers[0].target_unit.health if player1.soldiers[0].target_unit is not None else None} + {int(player1.soldiers[0].a_count)} + {player1.soldiers[0].health} + {len(player1.soldiers[0].animation)} + {player1.soldiers[0].attacking if isinstance(player1.soldiers[0], SwordsMan) else player1.soldiers[0].shooting}")
         player2.update()
-
 
 
 if __name__ == '__main__':

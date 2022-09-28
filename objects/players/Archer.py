@@ -6,6 +6,7 @@ from implementable import Functions
 from objects.Arrow import Arrow
 from objects.Constants import BARRACKS_POS, SCREEN_WIDTH, GROUND_HEIGHT, SCREEN_HEIGHT, ARCHER_SPEED, ARCHER_DAMAGE, \
     ARCHER_TRAIN, ARCHER_RANGE, ARCHER_REST, ARCHER_COST
+from objects.Wall import Wall
 
 
 class Archer:
@@ -26,6 +27,7 @@ class Archer:
     PLAYER2_FALLEN = {"root": "sprites/player2/bow/fallen/fallen-", "extension": ".png"}
 
     def __init__(self, player_type):
+        self.target_unit = None
         self.animation = None
         self.deploy = False
         self.ready_to_dispatch = False
@@ -96,8 +98,9 @@ class Archer:
 
     def update(self):
         self.range.midbottom = self.rect.midbottom
+
         if not self.dead:
-            if self.shooting and not self.falling:
+            if self.shooting and not self.falling and not self.run:
                 arrow = None
                 if self.rest(self.REST):
                     match self.player_type:
@@ -129,6 +132,11 @@ class Archer:
                 if self.falling and int(self.a_count) > 4:
                     self.dead = True
                     self.falling = False
+            if self.target_unit is not None and not isinstance(self.target_unit, Wall) and self.target_unit.dead:
+                self.run = True
+                self.shooting = False
+                self.arrows.clear()
+                self.load_run()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -146,13 +154,12 @@ class Archer:
                     self.rect = self.image.get_rect(midbottom=(self.x, self.y))
 
     def move_arrows(self, obj):
-        for arrow in self.arrows:
+        self.target_unit = obj
+        for i, arrow in enumerate(self.arrows):
             arrow.move_arrow()
-            if arrow.rect.colliderect(obj.rect) and not obj.dead:
+            if arrow.rect.colliderect(obj.rect) and obj.health > 0:
                 obj.health -= self.HIT_DAMAGE
-                self.arrows.remove(arrow)
-            if obj.dead:
-                self.shooting = False
+                del self.arrows[i]
 
     def load_shoot(self, image_path_root, img_extension):
         self.animation = Functions.loadImage(image_path_root, img_extension, 2)
