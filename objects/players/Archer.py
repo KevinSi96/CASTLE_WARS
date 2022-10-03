@@ -1,3 +1,4 @@
+import random
 import time
 
 import pygame as pg
@@ -37,6 +38,7 @@ class Archer:
         self.falling = False
         self.run = False
         self.dead = False
+        self.enemy_killed = False
         self.a_count = 0
         self.x = BARRACKS_POS if player_type == "p1" else SCREEN_WIDTH - BARRACKS_POS
         self.y = SCREEN_HEIGHT - GROUND_HEIGHT
@@ -104,6 +106,8 @@ class Archer:
         if not self.dead:
             if self.shooting and not self.falling and not self.run:
                 arrow = None
+                self.enemy_killed = False
+
                 if self.rest(self.REST):
                     match self.player_type:
                         case "p1":
@@ -118,7 +122,7 @@ class Archer:
                     self.image = self.animation[self.a_count]
                     self.rect = self.image.get_rect(midbottom=(self.x, self.y))
                     self.start_shoot = time.time()
-                elif self.rest(1):
+                elif self.rest(random.randint(1,10) * 0.1):
                     self.a_count = 0
                     self.image = self.animation[self.a_count]
                     self.rect = self.image.get_rect(midbottom=(self.x, self.y))
@@ -135,10 +139,13 @@ class Archer:
                     self.dead = True
                     self.falling = False
             if self.target_unit is not None and not isinstance(self.target_unit, Wall) and self.target_unit.dead:
-                self.run = True
                 self.shooting = False
                 self.arrows.clear()
                 self.load_run()
+                if self.rest(random.randint(1, 2)):
+                    self.run = True
+                elif not self.enemy_killed and not self.run:
+                    self.image = pg.image.load(Archer.PLAYER1_READY if self.player_type == "p1" else Archer.PLAYER2_READY)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -162,8 +169,11 @@ class Archer:
         self.target_unit = obj
         for i, arrow in enumerate(self.arrows):
             arrow.move_arrow()
-            if arrow.rect.colliderect(obj.rect) and obj.health > 0:
+            if arrow.rect.colliderect(obj.rect) and self.arrows and obj.health > 0:
                 obj.health -= self.HIT_DAMAGE
+                del self.arrows[i]
+            elif obj.health <= 0 and abs(arrow.x - obj.x) > 0:
+                self.enemy_killed = True
                 del self.arrows[i]
 
     def load_shoot(self, image_path_root, img_extension):

@@ -1,7 +1,6 @@
-import pygame as pg
 import math
 
-from implementable import Functions
+import pygame as pg
 
 
 class Arrow(pg.sprite.Sprite):

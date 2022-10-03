@@ -8,10 +8,11 @@ class Wall:
 
     def __init__(self, img, wall_x):
         self.img = img
+        self.x = wall_x
         self.rect = self.img.get_rect(midbottom=(wall_x, SCREEN_HEIGHT - GROUND_HEIGHT))
-
         # Wall health variables
         self.health = self.MAX_HEALTH
+        self.dead = self.health <= 0
         self.hb_width = 50
 
     def draw_health_bar(self, screen):

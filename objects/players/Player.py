@@ -40,7 +40,7 @@ class Player:
 
     def key_events(self, key):
         if key == self.keys.archer_train_key:
-            if self.player_resource >= 0:
+            if self.player_resource > 0:
                 self.player_resource -= ARCHER_COST
                 self.count_archer += 1
 
@@ -63,9 +63,8 @@ class Player:
                 self.swordsman_index, self.num_swordsmen = Functions.attack(self.swordsmen, self.swordsman_index,
                                                                             self.num_swordsmen)
 
-        if key == pg.K_z:
-            Functions.deploy_all(self.archers)
-            Functions.deploy_all(self.swordsmen)
+        if key == self.keys.unleash_key:
+            Functions.deploy_all(self.soldiers)
             self.num_archer = 0
             self.num_swordsmen = 0
 
@@ -78,11 +77,11 @@ class Player:
                                                                                       self.total_soldiers)
         Functions.add_to_queue(self.soldiers, self.swordsmen, self.count_sword,
                                "swordsmen_p1" if self.player_type == "p1" else "swordsmen_p2")
-        self.num_swordsmen, self.count_sword, self.total_swords = Functions.check_added(self.swordsmen,
-                                                                                        self.num_swordsmen,
-                                                                                        self.count_sword,
-                                                                                        "swordsmen_p1" if self.player_type == "p1" else "swordsmen_p2",
-                                                                                        self.total_soldiers)
+        self.num_swordsmen, self.count_sword, self.total = Functions.check_added(self.swordsmen,
+                                                                                 self.num_swordsmen,
+                                                                                 self.count_sword,
+                                                                                 "swordsmen_p1" if self.player_type == "p1" else "swordsmen_p2",
+                                                                                 self.total_soldiers)
         if self.count_archer <= 0:
             self.count_archer = 0
         if self.count_sword <= 0:
@@ -92,14 +91,15 @@ class Player:
             game_over = True
             return game_over
 
-        self.choose_target()
+        self.total_soldiers = len(self.soldiers)
 
         Functions.training(self.soldiers)
-        Functions.deploy(self.soldiers)
         Functions.collide(self.soldiers, self.targeted_unit)
+        Functions.deploy(self.soldiers)
         Functions.check_health(self.soldiers)
         Functions.check_dead(self.soldiers)
         self.castle.update(self.targeted_unit)
+        self.choose_target()
         return game_over
 
     def draw(self, screen):

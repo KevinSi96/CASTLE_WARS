@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 
 from objects.Wall import Wall
@@ -15,17 +17,44 @@ def attack(soldiers, soldier_index, soldier_counter):
             if soldier.ready_to_dispatch and isinstance(soldier, (Archer, SwordsMan)):
                 soldier.deploy = True
                 soldier.run = True
-                soldier.load_run()
+                if isinstance(soldier, Archer):
+                    if not soldier.shooting:
+                        soldier.load_run()
+                    else:
+                        soldier.ready_to_shoot()
+                else:
+                    soldier.load_run()
                 soldier_counter -= 1
+
     return soldier_index, soldier_counter
 
 
 def deploy_all(soldiers):
-    if isinstance(soldiers, list):
-        for soldier in soldiers:
-            if not soldier.run and not soldier.deploy:
-                soldier.deploy = True
-                soldier.run = True
+    for soldier in soldiers:
+        while True:
+            if soldier.rest(1):
+                break
+            else:
+                pass
+        if soldier.ready_to_dispatch and isinstance(soldier, (Archer, SwordsMan)):
+            soldier.deploy = True
+            soldier.run = True
+            if isinstance(soldier, Archer):
+                if not soldier.shooting:
+                    soldier.load_run()
+                else:
+                    soldier.ready_to_shoot()
+            else:
+                soldier.load_run()
+
+
+def deploy(soldiers):
+    for i, soldier in enumerate(soldiers):
+        if soldier.deploy:
+            if soldier.run:
+                soldier.move()
+            if isinstance(soldier, (Archer, SwordsMan)):
+                soldier.update()
 
 
 def check_added(soldiers, num_soldiers, count_soldiers, player_type, total):
@@ -117,13 +146,14 @@ def collide(soldiers, target_unit):
         for soldier in soldiers:
             if isinstance(soldier, Archer):
                 if soldier.range.colliderect(
-                        target_unit.range if not isinstance(target_unit, Wall) else target_unit.rect):
+                        target_unit.range if not isinstance(target_unit,
+                                                            Wall) else target_unit.rect) and not target_unit.dead:
                     soldier.run = False
                     soldier.ready_to_shoot()
                     if soldier.shooting:
                         soldier.move_arrows(target_unit)
             elif isinstance(soldier, SwordsMan):
-                if soldier.rect.colliderect(target_unit.rect):
+                if soldier.rect.colliderect(target_unit.rect) and not target_unit.dead:
                     soldier.run = False
                     soldier.attack()
                     if soldier.attacking:
@@ -137,20 +167,10 @@ def training(soldiers):
                 soldiers[i].train()
 
 
-def deploy(soldiers):
-    for i, soldier in enumerate(soldiers):
-        if soldier.deploy:
-            if soldier.run:
-                soldier.move()
-            if isinstance(soldier, (Archer, SwordsMan)):
-                soldier.update()
-
-
-
 def check_dead(soldiers):
     for i, soldier in enumerate(soldiers):
         if isinstance(soldier, (Archer, SwordsMan)):
-            if soldier.dead and soldier.rest(4):
+            if soldier.dead and soldier.rest(3):
                 del soldiers[i]
 
 
@@ -159,9 +179,12 @@ def check_health(soldiers):
         if isinstance(soldier, (Archer, SwordsMan)):
             if soldier.health <= 0:
                 soldier.run = False
+                if isinstance(soldier, Archer):
+                    soldier.arrows.clear()
                 soldier.shooting = False
                 soldier.attacking = False
                 soldier.falling = True
+
                 soldier.load_dead()
 
 
