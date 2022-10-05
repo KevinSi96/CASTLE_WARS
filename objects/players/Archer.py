@@ -11,7 +11,7 @@ from objects.Wall import Wall
 
 
 class Archer:
-    TRAIN_TURNS = ARCHER_TRAIN
+    TRAIN_TIME = ARCHER_TRAIN
     RANGE = ARCHER_RANGE
     HIT_DAMAGE = ARCHER_DAMAGE
     REST = ARCHER_REST
@@ -37,6 +37,7 @@ class Archer:
         self.health = Archer.MAX_HEALTH
         self.falling = False
         self.run = False
+        self.wait = True
         self.dead = False
         self.enemy_killed = False
         self.a_count = 0
@@ -44,9 +45,9 @@ class Archer:
         self.y = SCREEN_HEIGHT - GROUND_HEIGHT
         self.image = pg.image.load(Archer.PLAYER1_READY if player_type == "p1" else Archer.PLAYER2_READY)
         self.current_time = 0
-        self.start_shoot = 0
+        self.start_action = 0
         self.shooting = False
-        self.archer_added = False
+        self.added = False
         self.player_type = player_type
         self.arrows = []
 
@@ -60,25 +61,21 @@ class Archer:
         if self.run:
             match self.player_type:
                 case "p1":
-                    self.animation = Functions.loadImage(self.PLAYER1_RUN.get("root"),
-                                                         self.PLAYER1_RUN.get("extension"),
-                                                         11)
+                    self.animation = Functions.loadImage(self.PLAYER1_RUN, 11, False)
                 case "p2":
-                    self.animation = Functions.loadImage(self.PLAYER2_RUN.get("root"),
-                                                         self.PLAYER2_RUN.get("extension"),
-                                                         11)
+                    self.animation = Functions.loadImage(self.PLAYER2_RUN, 11, False)
 
     def ready_to_shoot(self):
         if not self.falling and not self.dead:
             if not self.run and not self.shooting:
-                self.start_shoot = time.time()
+                self.start_action = time.time()
                 match self.player_type:
                     case "p1":
                         self.image = pg.image.load(self.PLAYER1_READY)
                         if not self.shooting:
                             self.shooting = True
                             self.a_count = 0
-                            self.load_shoot(self.PLAYER1_SHOOT.get("root"), self.PLAYER1_SHOOT.get("extension"))
+                            self.load_shoot(self.PLAYER1_SHOOT)
                             self.rect = self.image.get_rect(midbottom=(self.x, self.y))
 
                     case "p2":
@@ -86,19 +83,17 @@ class Archer:
                         if not self.shooting:
                             self.shooting = True
                             self.a_count = 0
-                            self.load_shoot(self.PLAYER2_SHOOT.get("root"), self.PLAYER2_SHOOT.get("extension"))
+                            self.load_shoot(self.PLAYER2_SHOOT)
                             self.rect = self.image.get_rect(midbottom=(self.x, self.y))
 
     def load_dead(self):
         if self.falling:
             match self.player_type:
                 case "p1":
-                    self.animation = Functions.loadImage(self.PLAYER1_FALLEN.get("root"),
-                                                         self.PLAYER1_FALLEN.get("extension"), 6)
+                    self.animation = Functions.loadImage(self.PLAYER1_FALLEN, 6, False)
 
                 case "p2":
-                    self.animation = Functions.loadImage(self.PLAYER2_FALLEN.get("root"),
-                                                         self.PLAYER2_FALLEN.get("extension"), 6)
+                    self.animation = Functions.loadImage(self.PLAYER2_FALLEN, 6, False)
 
     def update(self):
         self.range.midbottom = self.rect.midbottom
@@ -121,7 +116,7 @@ class Archer:
                     self.a_count = 1
                     self.image = self.animation[self.a_count]
                     self.rect = self.image.get_rect(midbottom=(self.x, self.y))
-                    self.start_shoot = time.time()
+                    self.start_action = time.time()
                 elif self.rest(random.randint(1,10) * 0.1):
                     self.a_count = 0
                     self.image = self.animation[self.a_count]
@@ -140,7 +135,6 @@ class Archer:
                     self.falling = False
             if self.target_unit is not None and not isinstance(self.target_unit, Wall) and self.target_unit.dead:
                 self.shooting = False
-                self.arrows.clear()
                 self.load_run()
                 if self.rest(random.randint(1, 2)):
                     self.run = True
@@ -151,7 +145,6 @@ class Archer:
         screen.blit(self.image, self.rect)
         for arrow in self.arrows:
             arrow.draw_arrows(screen)
-
         if not self.dead and self.health < self.MAX_HEALTH:
             self.draw_health_bar(screen)
 
@@ -172,22 +165,22 @@ class Archer:
             if arrow.rect.colliderect(obj.rect) and self.arrows and obj.health > 0:
                 obj.health -= self.HIT_DAMAGE
                 del self.arrows[i]
-            elif obj.health <= 0 and abs(arrow.x - obj.x) > 0:
+            elif obj.health <= 0:
                 self.enemy_killed = True
                 del self.arrows[i]
 
-    def load_shoot(self, image_path_root, img_extension):
-        self.animation = Functions.loadImage(image_path_root, img_extension, 2)
+    def load_shoot(self, image_map):
+        self.animation = Functions.loadImage(image_map, 2, False)
 
     def rest(self, rest_amount):
-        if rest_amount > (self.current_time - self.start_shoot):
+        if rest_amount > (self.current_time - self.start_action):
             self.current_time = time.time()
             return False
         else:
             return True
 
     def train(self):
-        if round(self.current_time - self.start_time) < self.TRAIN_TURNS:
+        if round(self.current_time - self.start_time) < self.TRAIN_TIME:
             self.current_time = time.time()
         else:
             self.ready_to_dispatch = True

@@ -1,10 +1,10 @@
 import pygame as pg
 
-from objects.Constants import GROUND_HEIGHT, SCREEN_HEIGHT
+from objects.Constants import GROUND_HEIGHT, SCREEN_HEIGHT, WALL_HEALTH
 
 
 class Wall:
-    MAX_HEALTH = 1000
+    MAX_HEALTH = WALL_HEALTH
 
     def __init__(self, img, wall_x):
         self.img = img

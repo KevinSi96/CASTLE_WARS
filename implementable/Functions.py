@@ -1,41 +1,17 @@
-import random
-
 import pygame as pg
 
 from objects.Wall import Wall
 from objects.players.Archer import Archer
 from objects.players.SwordsMan import SwordsMan
+from objects.players.Worker import Worker
 
 
 def attack(soldiers, soldier_index, soldier_counter):
-    if isinstance(soldiers, list):
-        if len(soldiers) > 0:
-            if soldier_index >= len(soldiers):
-                soldier_index = 0
-            soldier = soldiers[soldier_index]
-            soldier_index += 1
-            if soldier.ready_to_dispatch and isinstance(soldier, (Archer, SwordsMan)):
-                soldier.deploy = True
-                soldier.run = True
-                if isinstance(soldier, Archer):
-                    if not soldier.shooting:
-                        soldier.load_run()
-                    else:
-                        soldier.ready_to_shoot()
-                else:
-                    soldier.load_run()
-                soldier_counter -= 1
-
-    return soldier_index, soldier_counter
-
-
-def deploy_all(soldiers):
-    for soldier in soldiers:
-        while True:
-            if soldier.rest(1):
-                break
-            else:
-                pass
+    if len(soldiers) > 0:
+        if soldier_index >= len(soldiers):
+            soldier_index = 0
+        soldier = soldiers[soldier_index]
+        soldier_index += 1
         if soldier.ready_to_dispatch and isinstance(soldier, (Archer, SwordsMan)):
             soldier.deploy = True
             soldier.run = True
@@ -46,99 +22,141 @@ def deploy_all(soldiers):
                     soldier.ready_to_shoot()
             else:
                 soldier.load_run()
+            soldier_counter -= 1
+        if soldier_counter <= 0:
+            soldier_counter = 0
+    return soldier_index, soldier_counter
 
 
-def deploy(soldiers):
-    for i, soldier in enumerate(soldiers):
+def run_to_mine(workers):
+    for worker in workers and workers:
+        if worker.ready_to_dispatch and not worker.digging:
+            worker.deploy = True
+            worker.run = True
+            worker.run_to_mine = True
+            worker.digging = False
+            worker.repairing = False
+            worker.run_to_wall = False
+            worker.to_mine()
+
+
+def at_mine(workers):
+    if all(worker.digging for worker in workers):
+        return False
+    else:
+        return True
+
+
+def run_to_wall(workers):
+    for worker in workers and workers:
+        # if worker.ready_to_dispatch and worker.player.castle.wall.health < Wall.MAX_HEALTH:
+        if worker.ready_to_dispatch and not worker.repairing:
+            worker.deploy = True
+            worker.run = True
+            worker.digging = False
+            worker.repairing = False
+            worker.run_to_mine = False
+            worker.run_to_wall = True
+            worker.to_wall()
+
+
+def at_wall(workers):
+    if all(worker.repairing for worker in workers):
+        return False
+    else:
+        return True
+
+
+def deploy_all(soldiers):
+    if all(soldier.deploy for soldier in soldiers):
+        return False
+    else:
+        return True
+
+
+def deploy(units):
+    for i, soldier in enumerate(units):
         if soldier.deploy:
             if soldier.run:
                 soldier.move()
-            if isinstance(soldier, (Archer, SwordsMan)):
-                soldier.update()
+            soldier.update()
 
 
-def check_added(soldiers, num_soldiers, count_soldiers, player_type, total):
-    if isinstance(soldiers, list):
-        for i in range(len(soldiers)):
-            match player_type:
-                case "archers_p1":
-                    if isinstance(soldiers[i], Archer):
-                        if soldiers[i].ready_to_dispatch and not soldiers[i].archer_added:
-                            soldiers[i].archer_added = True
-                            num_soldiers += 1
-                            count_soldiers -= 1
-                            total += 1
-                case "archers_p2":
-                    if isinstance(soldiers[i], Archer):
-                        if soldiers[i].ready_to_dispatch and not soldiers[i].archer_added:
-                            soldiers[i].archer_added = True
-                            num_soldiers += 1
-                            count_soldiers -= 1
-                            total += 1
-                case "swordsmen_p1":
-                    if isinstance(soldiers[i], SwordsMan):
-                        if soldiers[i].ready_to_dispatch and not soldiers[i].swordsman_added:
-                            soldiers[i].swordsman_added = True
-                            num_soldiers += 1
-                            count_soldiers -= 1
-                            total += 1
-                case "swordsmen_p2":
-                    if isinstance(soldiers[i], SwordsMan):
-                        if soldiers[i].ready_to_dispatch and not soldiers[i].swordsman_added:
-                            soldiers[i].swordsman_added = True
-                            num_soldiers += 1
-                            count_soldiers -= 1
-                            total += 1
-    return num_soldiers, count_soldiers, total
+def check_added(units, num_units, count_units, total):
+    if isinstance(units, list):
+        for i in range(len(units)):
+            if isinstance(units[i], (Archer, SwordsMan, Worker)):
+                if units[i].ready_to_dispatch and not units[i].added:
+                    units[i].added = True
+                    num_units += 1
+                    count_units -= 1
+                    total += 1
+    return num_units, count_units, total
 
 
-def add_to_queue(military_unit, soldiers, count_soldiers, player_type):
-    if isinstance(soldiers, list):
+def add_to_queue(military_unit, units, count_soldiers, player_type):
+    if isinstance(units, list):
         for i in range(count_soldiers):
             match player_type:
-                case "archers_p1":
+                case "a_p1":
                     soldier = Archer("p1")
-                    if len(soldiers) > 0:
-                        prev_soldier = soldiers[len(soldiers) - 1]
-                        if prev_soldier.ready_to_dispatch and prev_soldier.archer_added:
-                            soldiers.append(soldier)
+                    if len(units) > 0:
+                        prev_soldier = units[len(units) - 1]
+                        if prev_soldier.ready_to_dispatch and prev_soldier.added:
+                            units.append(soldier)
                             military_unit.append(soldier)
                     else:
-                        soldiers.append(soldier)
+                        units.append(soldier)
                         military_unit.append(soldier)
 
-                case "archers_p2":
+                case "a_p2":
                     soldier = Archer("p2")
-                    if len(soldiers) > 0:
-                        prev_soldier = soldiers[len(soldiers) - 1]
-                        if prev_soldier.ready_to_dispatch and prev_soldier.archer_added:
-                            soldiers.append(soldier)
+                    if len(units) > 0:
+                        prev_soldier = units[len(units) - 1]
+                        if prev_soldier.ready_to_dispatch and prev_soldier.added:
+                            units.append(soldier)
                             military_unit.append(soldier)
                     else:
-                        soldiers.append(soldier)
+                        units.append(soldier)
                         military_unit.append(soldier)
 
-                case "swordsmen_p1":
+                case "s_p1":
                     soldier = SwordsMan("p1")
-                    if len(soldiers) > 0:
-                        prev_soldier = soldiers[len(soldiers) - 1]
-                        if prev_soldier.ready_to_dispatch and prev_soldier.swordsman_added:
-                            soldiers.append(soldier)
+                    if len(units) > 0:
+                        prev_soldier = units[len(units) - 1]
+                        if prev_soldier.ready_to_dispatch and prev_soldier.added:
+                            units.append(soldier)
                             military_unit.append(soldier)
                     else:
-                        soldiers.append(soldier)
+                        units.append(soldier)
                         military_unit.append(soldier)
 
-                case "swordsmen_p2":
+                case "s_p2":
                     soldier = SwordsMan("p2")
-                    if len(soldiers) > 0:
-                        prev_soldier = soldiers[len(soldiers) - 1]
-                        if prev_soldier.ready_to_dispatch and prev_soldier.swordsman_added:
-                            soldiers.append(soldier)
+                    if len(units) > 0:
+                        prev_soldier = units[len(units) - 1]
+                        if prev_soldier.ready_to_dispatch and prev_soldier.added:
+                            units.append(soldier)
                             military_unit.append(soldier)
                     else:
-                        soldiers.append(soldier)
+                        units.append(soldier)
                         military_unit.append(soldier)
+                case "w_p1":
+                    worker = Worker(military_unit)
+                    if len(units) > 0:
+                        prev_worker = units[len(units) - 1]
+                        if prev_worker.ready_to_dispatch and prev_worker.added:
+                            units.append(worker)
+                    else:
+                        units.append(worker)
+                case "w_p2":
+                    worker = Worker(military_unit)
+                    if len(units) > 0:
+                        prev_worker = units[len(units) - 1]
+                        if prev_worker.ready_to_dispatch and prev_worker.added:
+                            units.append(worker)
+                    else:
+                        units.append(worker)
 
 
 def collide(soldiers, target_unit):
@@ -160,11 +178,11 @@ def collide(soldiers, target_unit):
                         soldier.target_unit = target_unit
 
 
-def training(soldiers):
-    if isinstance(soldiers, list):
-        for i in range(len(soldiers)):
-            if soldiers[i].ready_to_dispatch is False:
-                soldiers[i].train()
+def training(units):
+    if isinstance(units, list):
+        for i in range(len(units)):
+            if units[i].ready_to_dispatch is False:
+                units[i].train()
 
 
 def check_dead(soldiers):
@@ -188,15 +206,25 @@ def check_health(soldiers):
                 soldier.load_dead()
 
 
-def draw(soldiers, screen):
-    for i in range(len(soldiers)):
-        if soldiers[i].ready_to_dispatch:
-            soldiers[i].draw(screen)
+def check_worker_action(units):
+    for i, unit in enumerate(units):
+        if unit.digging:
+            unit.dig()
+        elif unit.repairing:
+            unit.repair()
 
 
-def loadImage(image_path_root, img_extension, num_img):
+def draw(units, screen):
+    for i in range(len(units)):
+        if units[i].ready_to_dispatch:
+            units[i].draw(screen)
+
+
+def loadImage(image_map, num_img, flip):
     images = {}
     for i in range(num_img):
-        image = pg.image.load(image_path_root + str(i) + img_extension)
+        image = pg.image.load(image_map['root'] + str(i) + image_map['extension'])
+        if flip:
+            image = pg.transform.flip(image, True, False)
         images[i] = image
     return images

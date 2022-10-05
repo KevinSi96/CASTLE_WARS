@@ -9,7 +9,6 @@ class Arrow(pg.sprite.Sprite):
     def __init__(self, position_X, position_Y, img_root, img_extension, player, angle):
         super().__init__()
         self.shoot = False
-        self.hit = False
         self.x = position_X
         self.y = position_Y
         self.animation = self.load_arrows(img_root, img_extension, 2)
@@ -32,7 +31,7 @@ class Arrow(pg.sprite.Sprite):
         self.image = self.animation[int(self.a_count)]
 
     def move_arrow(self):
-        if self.shoot and not self.hit:
+        if self.shoot:
             self.x += self.speedX
             self.rect = self.image.get_rect(midbottom=(self.x, self.y))
 

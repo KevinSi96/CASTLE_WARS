@@ -4,24 +4,6 @@ pygame.init()
 
 PLAYER_START_RESOURCES = 100
 
-# COMMANDS
-PL1_WORKER_TRAIN = 'q'
-PL1_SWORD_TRAIN = 'w'
-PL1_ARCHER_TRAIN = 'e'
-PL1_TO_MINE = 'a'
-PL1_TO_WALL = 's'
-PL1_SWORD_ATTACK = 'd'
-PL1_ARCHER = 'f'
-PL1_UNLEASH = 'z'
-
-PL2_WORKER_TRAIN = 'p'
-PL2_SWORD_TRAIN = 'o'
-PL2_ARCHER_TRAIN = 'i'
-PL2_TO_MINE = 'l'
-PL2_TO_WALL = 'k'
-PL2_SWORD_ATTACK = 'j'
-PL2_ARCHER = 'h'
-PL2_UNLEASH = 'm'
 
 PLAYER1_KEY_COMMANDS = {
     "worker_train": "q",
@@ -33,6 +15,7 @@ PLAYER1_KEY_COMMANDS = {
     "archer_attack": "f",
     "unleash": "z"
 }
+
 PLAYER2_KEY_COMMANDS = {
     "worker_train": "p",
     "sword_train": "o",
@@ -46,7 +29,7 @@ PLAYER2_KEY_COMMANDS = {
 
 # ARCHER CONTANTS
 ARCHER_COST = 5
-ARCHER_TRAIN = 0
+ARCHER_TRAIN = 1
 ARCHER_SPEED = 3
 ARCHER_DAMAGE = 20
 ARCHER_RANGE = 100
@@ -64,9 +47,9 @@ SWORD_REST = 2
 # WORKER CONTANTS
 WORKER_COST = 5
 WORKER_TRAIN = 2
-WORKER_SPEED = 2
+WORKER_SPEED = 1
 WORKER_PROD = 3
-WORKER_REPAIR = 100
+WORKER_REPAIR = 10
 
 # GLOBAL
 SCREEN_WIDTH = 1000
@@ -75,6 +58,7 @@ GROUND_HEIGHT = 70
 WALL_POS = 180
 WALL_WIDTH = 62
 WALL_HEIGHT = 80
+WALL_HEALTH = 1000
 MINE_POS = 40
 MINE_WIDTH = 58
 MINE_HEIGHT = 37
@@ -84,7 +68,6 @@ BARRACKS_HEIGHT = 50
 TOWER_HEIGHT = 160
 
 # SPRITE MAPS
-
 P1_SPRITES = {"building":
     {
         "barracks": pygame.image.load("./sprites/player1/building/barracks.png"),

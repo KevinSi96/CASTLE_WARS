@@ -18,7 +18,7 @@ class Castle:
         self.mine = Mine(player_sprites['building']['mine'], mine_x)
         self.tower = Tower(player_sprites['building']['tower'], tower_x, player.player_type)
 
-    def update(self, target):
+    def update(self, target, enemy_units):
         self.barracks.update()
         # self.tower.update(target, enemy_units)
 

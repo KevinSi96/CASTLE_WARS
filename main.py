@@ -5,11 +5,9 @@ import pygame as pg
 from objects.Constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER1_KEY_COMMANDS, PLAYER2_KEY_COMMANDS
 from objects.Inputs import Inputs
 from objects.players.Player import Player
-from objects.players.SwordsMan import SwordsMan
 
 pg.init()
 
-INITIAL_RESOURCE = 30000
 
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
@@ -23,6 +21,7 @@ def main():
     global player1, player2
     game_over = False
     winner = None
+
     player1_inputs = Inputs(PLAYER1_KEY_COMMANDS)
     player2_inputs = Inputs(PLAYER2_KEY_COMMANDS)
 
@@ -41,9 +40,11 @@ def main():
         screen.blit(BG, (0, 0))
 
         ready_archers_label_1 = default_font.render(f"Ready Archers: {player1.num_archer}", True, (255, 0, 255))
+        ready_workers_label_1 = default_font.render(f" | Ready Workers: {player1.num_workers}", True, (255, 0, 255))
         ready_swordsmen_label_1 = default_font.render(f"| Ready Swordsmen: {player1.num_swordsmen}", True,
                                                       (255, 0, 255))
         archers_in_training_1 = default_font.render(f"Issued archers: {player1.count_archer}", True, (255, 0, 255))
+        workers_in_training_1 = default_font.render(f" | Issued workers: {player1.count_workers}", True, (255, 0, 255))
         swordsmen_in_training_1 = default_font.render(f"| Issued swordsmen: {player1.count_sword}", True, (255, 0, 255))
         player1_resource_label = resource_font.render(f"Resource: {player1.player_resource}", True, (255, 0, 0))
         tot_soldiers_p1_label = default_font.render(f"Total number of soldiers: {player1.total_soldiers}",
@@ -62,6 +63,8 @@ def main():
         screen.blit(ready_swordsmen_label_1, (ready_archers_label_1.get_width() + 15, 35))
         screen.blit(archers_in_training_1, (10, 45))
         screen.blit(swordsmen_in_training_1, (archers_in_training_1.get_width() + 15, 45))
+        screen.blit(ready_workers_label_1, (ready_archers_label_1.get_width() + ready_swordsmen_label_1.get_width() + 15, 35))
+        screen.blit(workers_in_training_1, (archers_in_training_1.get_width() + swordsmen_in_training_1.get_width() + 15, 45))
         screen.blit(tot_soldiers_p1_label, (10, 60))
 
         screen.blit(player2_resource_label, (SCREEN_WIDTH - player2_resource_label.get_width(), 5))
@@ -96,7 +99,6 @@ def main():
             if event.type == pg.KEYDOWN:
                 player1.key_events(event.key)
                 player2.key_events(event.key)
-        print(game_over)
         if not game_over:
             game_over = player1.update(game_over)
             game_over = player2.update(game_over)

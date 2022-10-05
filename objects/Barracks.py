@@ -32,9 +32,9 @@ class Barracks:
         self.count_swords = 0
         # Initialize the barracks with one of each unit
         self.ready_units = [
-            # Worker(self.player, self.player.isLeftPlayer),
-            Archer(self.player.player_type)
-            # SwordsMan(self.player.isLeftPlayer)
+            Worker(self.player),
+            Archer(self.player.player_type),
+            SwordsMan(self.player.player_type)
         ]
 
     def check_training_queue(self):

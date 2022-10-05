@@ -34,14 +34,15 @@ class SwordsMan:
         self.falling = False
         self.run = False
         self.dead = False
+        self.wait = True
         self.a_count = 0
         self.x = BARRACKS_POS if player_type == "p1" else SCREEN_WIDTH - BARRACKS_POS
         self.y = SCREEN_HEIGHT - GROUND_HEIGHT
         self.image = pg.image.load(SwordsMan.PLAYER1_READY if player_type == "p1" else SwordsMan.PLAYER2_READY)
         self.current_time = 0
-        self.start_attack = 0
+        self.start_action = 0
         self.attacking = False
-        self.swordsman_added = False
+        self.added = False
         self.player_type = player_type
         self.target_unit = None
 
@@ -55,45 +56,40 @@ class SwordsMan:
         if self.run:
             match self.player_type:
                 case "p1":
-                    self.animation = Functions.loadImage(self.PLAYER1_RUN.get("root"),
-                                                         self.PLAYER1_RUN.get("extension"),
-                                                         11)
+                    self.animation = Functions.loadImage(self.PLAYER1_RUN, 11, False)
+
                 case "p2":
-                    self.animation = Functions.loadImage(self.PLAYER2_RUN.get("root"),
-                                                         self.PLAYER2_RUN.get("extension"),
-                                                         11)
+                    self.animation = Functions.loadImage(self.PLAYER2_RUN, 11, False)
 
     def attack(self):
         if not self.falling and not self.dead:
             if not self.run and not self.attacking:
-                self.start_attack = 0
+                self.start_action = 0
                 match self.player_type:
                     case "p1":
                         self.image = pg.image.load(self.PLAYER1_READY)
                         if not self.attacking:
                             self.attacking = True
                             self.a_count = 0
-                            self.load_attack(self.PLAYER1_SHOOT.get("root"), self.PLAYER1_SHOOT.get("extension"))
+                            self.load_attack(self.PLAYER1_SHOOT)
                     case "p2":
                         self.image = pg.image.load(self.PLAYER2_READY)
                         if not self.attacking:
                             self.attacking = True
                             self.a_count = 0
-                            self.load_attack(self.PLAYER2_SHOOT.get("root"), self.PLAYER2_SHOOT.get("extension"))
+                            self.load_attack(self.PLAYER2_SHOOT)
 
-    def load_attack(self, image_path_root, img_extension):
-        self.animation = Functions.loadImage(image_path_root, img_extension, 8)
+    def load_attack(self, image_map):
+        self.animation = Functions.loadImage(image_map, 8, False)
 
     def load_dead(self):
         if self.falling:
             match self.player_type:
                 case "p1":
-                    self.animation = Functions.loadImage(self.PLAYER1_FALLEN.get("root"),
-                                                         self.PLAYER1_FALLEN.get("extension"), 6)
+                    self.animation = Functions.loadImage(self.PLAYER1_FALLEN, 6, False)
 
                 case "p2":
-                    self.animation = Functions.loadImage(self.PLAYER2_FALLEN.get("root"),
-                                                         self.PLAYER2_FALLEN.get("extension"), 6)
+                    self.animation = Functions.loadImage(self.PLAYER2_FALLEN, 6, False)
 
     def update(self):
         self.range.midbottom = self.rect.midbottom
@@ -103,7 +99,7 @@ class SwordsMan:
                 if self.rest(1):
                     self.target_unit.health -= SwordsMan.HIT_DAMAGE
                     self.a_count = 0
-                    self.start_attack = time.time()
+                    self.start_action = time.time()
 
             else:
                 if self.a_count > len(self.animation):
@@ -115,10 +111,10 @@ class SwordsMan:
 
                 self.image = self.animation[int(self.a_count)]
                 self.rect = self.image.get_rect(midbottom=(self.x, self.y))
-                if not self.falling:
-                    self.a_count += 0.2
-                else:
-                    self.a_count += 0.1
+            if not self.falling:
+                self.a_count += 0.2
+            else:
+                self.a_count += 0.1
             if self.target_unit is not None and not isinstance(self.target_unit, Wall) and self.target_unit.dead:
                 self.run = True
                 self.attacking = False
@@ -157,9 +153,8 @@ class SwordsMan:
             self.ready_to_dispatch = True
 
     def rest(self, rest_amount):
-        if rest_amount > (self.current_time - self.start_attack):
+        if rest_amount > (self.current_time - self.start_action):
             self.current_time = time.time()
             return False
         else:
             return True
-
