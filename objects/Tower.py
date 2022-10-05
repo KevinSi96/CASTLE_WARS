@@ -31,7 +31,6 @@ class Tower:
 
     def update(self, target):
         if self.attacking and not self.resting:
-            arrow = None
             if self.rest(1):
                 x = abs(self.rect.centerx - target.rect.centerx)
                 y = target.rect.centery - self.rect.top

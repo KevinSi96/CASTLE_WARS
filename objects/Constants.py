@@ -28,7 +28,7 @@ PLAYER2_KEY_COMMANDS = {
 
 # ARCHER CONTANTS
 ARCHER_COST = 5
-ARCHER_TRAIN = 0
+ARCHER_TRAIN = 2
 ARCHER_SPEED = 2
 ARCHER_DAMAGE = 20
 ARCHER_RANGE = 100
@@ -37,7 +37,7 @@ ARCHER_HEALTH = 100
 
 # SWORD CONTANTS
 SWORD_COST = 5
-SWORD_TRAIN = 0
+SWORD_TRAIN = 2
 SWORD_SPEED = 2
 SWORD_DAMAGE = 20
 SWORD_RANGE = 10
@@ -85,3 +85,11 @@ P2_SPRITES = {"building":
         "wall": pygame.image.load("./sprites/player2/building/wall.png")
     }
 }
+
+BG = pygame.transform.scale(pygame.image.load("sprites/background/BG.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Fonts
+DEFAULT_FONT = pygame.font.SysFont("comicsans", 12)
+RESOURCE_FONT = pygame.font.SysFont("comicsans", 20)
+GAME_OVER_FONT = pygame.font.Font('font/pixel.ttf', 40)
+PRESS_ANY_KEY_FONT = pygame.font.Font('font/pixel.ttf', 25)
