@@ -4,7 +4,6 @@ pygame.init()
 
 PLAYER_START_RESOURCES = 100
 
-
 PLAYER1_KEY_COMMANDS = {
     "worker_train": "q",
     "sword_train": "w",
@@ -29,7 +28,7 @@ PLAYER2_KEY_COMMANDS = {
 
 # ARCHER CONTANTS
 ARCHER_COST = 5
-ARCHER_TRAIN = 2
+ARCHER_TRAIN = 0
 ARCHER_SPEED = 2
 ARCHER_DAMAGE = 20
 ARCHER_RANGE = 100
@@ -38,7 +37,7 @@ ARCHER_HEALTH = 100
 
 # SWORD CONTANTS
 SWORD_COST = 5
-SWORD_TRAIN = 2
+SWORD_TRAIN = 0
 SWORD_SPEED = 2
 SWORD_DAMAGE = 20
 SWORD_RANGE = 10
@@ -68,6 +67,7 @@ BARRACKS_HEIGHT = 50
 TOWER_HEIGHT = 160
 
 # SPRITE MAPS
+
 P1_SPRITES = {"building":
     {
         "barracks": pygame.image.load("./sprites/player1/building/barracks.png"),

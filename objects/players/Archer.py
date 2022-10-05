@@ -27,6 +27,8 @@ class Archer:
     PLAYER2_SHOOT = {"root": "sprites/player2/bow/shoot/shoot-", "extension": ".png"}
     PLAYER1_FALLEN = {"root": "sprites/player1/bow/fallen/fallen-", "extension": ".png"}
     PLAYER2_FALLEN = {"root": "sprites/player2/bow/fallen/fallen-", "extension": ".png"}
+    PLAYER1_ARROW = {"root": "sprites/player1/bow/", "extension": ".png"}
+    PLAYER2_ARROW = {"root": "sprites/player2/bow/", "extension": ".png"}
 
     def __init__(self, player_type):
         self.hb_width = 15
@@ -106,18 +108,16 @@ class Archer:
                 if self.rest(self.REST):
                     match self.player_type:
                         case "p1":
-                            arrow = Arrow(self.rect.right, self.rect.centery, "sprites/player1/bow/arrow_hor/arrowhor-",
-                                          ".png", True, 0)
+                            arrow = Arrow(self.rect.right, self.rect.centery, self.PLAYER1_ARROW, True, 0)
                         case "p2":
-                            arrow = Arrow(self.rect.left, self.rect.centery, "sprites/player2/bow/arrow_hor/arrowhor-",
-                                          ".png", False, 0)
+                            arrow = Arrow(self.rect.left, self.rect.centery, self.PLAYER2_ARROW, False, 0)
                     arrow.shoot = True
                     self.arrows.append(arrow)
                     self.a_count = 1
                     self.image = self.animation[self.a_count]
                     self.rect = self.image.get_rect(midbottom=(self.x, self.y))
                     self.start_action = time.time()
-                elif self.rest(random.randint(1,10) * 0.1):
+                elif self.rest(random.randint(1, 10) * 0.1):
                     self.a_count = 0
                     self.image = self.animation[self.a_count]
                     self.rect = self.image.get_rect(midbottom=(self.x, self.y))
@@ -139,7 +139,8 @@ class Archer:
                 if self.rest(random.randint(1, 2)):
                     self.run = True
                 elif not self.enemy_killed and not self.run:
-                    self.image = pg.image.load(Archer.PLAYER1_READY if self.player_type == "p1" else Archer.PLAYER2_READY)
+                    self.image = pg.image.load(
+                        Archer.PLAYER1_READY if self.player_type == "p1" else Archer.PLAYER2_READY)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)

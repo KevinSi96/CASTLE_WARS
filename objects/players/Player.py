@@ -1,19 +1,13 @@
-import random
 import time
 
 from implementable import Functions
 from objects.Castle import Castle
 from objects.Constants import *
+from objects.Wall import Wall
 
 
 class Player:
     def __init__(self, player_type, keys):
-        self.worker_index = 0
-        self.total_workers = 0
-        self.num_workers = 0
-        self.start_action = 0
-        self.current_time = 0
-        self.total_swords = 0
         self.to_wall = False
         self.to_mine = False
         self.targeted_unit = None
@@ -22,6 +16,11 @@ class Player:
         self.total_archer = 0
         self.swordsmen = []
         self.archers = []
+        self.worker_index = 0
+        self.num_workers = 0
+        self.start_action = 0
+        self.current_time = 0
+        self.total_swords = 0
         self.swordsman_index = 0
         self.num_swordsmen = 0
         self.archer_index = 0
@@ -89,6 +88,7 @@ class Player:
             self.num_swordsmen = 0
 
     def update(self, game_over):
+        self.choose_target()
 
         Functions.add_to_queue(self.soldiers, self.archers, self.count_archer,
                                "a_p1" if self.player_type == "p1" else "a_p2")
@@ -102,10 +102,10 @@ class Player:
                                                                                         self.count_sword,
                                                                                         self.total_soldiers)
         Functions.add_to_queue(self, self.workers, self.count_workers, "w_p1" if self.player_type == "p1" else "w_p2")
-        self.num_workers, self.count_workers, self.total_workers = Functions.check_added(self.workers,
-                                                                                         self.num_workers,
-                                                                                         self.count_workers,
-                                                                                         self.total_workers)
+        self.num_workers, self.count_workers, NoneType = Functions.check_added(self.workers,
+                                                                               self.num_workers,
+                                                                               self.count_workers,
+                                                                               None)
 
         if self.count_archer <= 0:
             self.count_archer = 0
@@ -116,11 +116,14 @@ class Player:
 
         if self.opponent.castle.wall.health <= 0:
             game_over = True
+        if self.castle.wall.health <= Wall.MAX_HEALTH / 2:
+            self.to_wall = True
 
         self.total_soldiers = len(self.soldiers)
 
         if self.deploy_all:
-            if self.rest(random.randint(1, 2)):
+            if self.rest(0.3):
+                self.start_action = time.time()
                 self.archer_index, self.num_archer = Functions.attack(self.archers, self.archer_index, self.num_archer)
                 self.swordsman_index, self.num_swordsmen = Functions.attack(self.swordsmen, self.swordsman_index,
                                                                             self.num_swordsmen)
@@ -140,13 +143,9 @@ class Player:
         Functions.deploy(self.workers)
         Functions.check_health(self.soldiers)
         Functions.check_dead(self.soldiers)
+        Functions.tower_collide(self.castle.tower, self.targeted_unit)
         Functions.check_worker_action(self.workers)
-        self.castle.update(self.targeted_unit, self.opponent.soldiers)
-        self.choose_target()
-        if len(self.workers) > 0:
-            # print(len(self.workers[0].animation) if self.workers[0].animation is not None else 0)
-            print(f"{self.workers[0].run_to_mine} + {self.workers[0].run_to_wall} + {self.workers[0].run} + {self.workers[0].digging} + {self.workers[0].repairing}  ")
-            # print(f"{self.to_mine} + {self.to_wall}  ")
+        self.castle.update(self.targeted_unit)
         return game_over
 
     def draw(self, screen):

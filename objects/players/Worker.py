@@ -129,8 +129,6 @@ class Worker:
                 self.a_count += 0.2
             if self.a_count > len(self.animation):
                 self.a_count = 0
-            # if self.run_to_wall or self.run_to_mine:
-            #     self.
             self.image = self.animation[int(self.a_count)]
             self.rect = self.image.get_rect(midbottom=(self.x, self.y))
 

@@ -95,7 +95,7 @@ class SwordsMan:
         self.range.midbottom = self.rect.midbottom
         if not self.dead:
 
-            if self.attacking and self.target_unit.health > 0 and self.a_count >= 6:
+            if self.attacking and self.target_unit.health > 0 and self.a_count >= 6 and not self.run:
                 if self.rest(1):
                     self.target_unit.health -= SwordsMan.HIT_DAMAGE
                     self.a_count = 0

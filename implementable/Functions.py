@@ -90,7 +90,8 @@ def check_added(units, num_units, count_units, total):
                     units[i].added = True
                     num_units += 1
                     count_units -= 1
-                    total += 1
+                    if total is not None:
+                        total += 1
     return num_units, count_units, total
 
 
@@ -165,17 +166,26 @@ def collide(soldiers, target_unit):
             if isinstance(soldier, Archer):
                 if soldier.range.colliderect(
                         target_unit.range if not isinstance(target_unit,
-                                                            Wall) else target_unit.rect) and not target_unit.dead:
+                                                            Wall) else target_unit.rect):
                     soldier.run = False
                     soldier.ready_to_shoot()
                     if soldier.shooting:
                         soldier.move_arrows(target_unit)
             elif isinstance(soldier, SwordsMan):
-                if soldier.rect.colliderect(target_unit.rect) and not target_unit.dead:
+                if soldier.rect.colliderect(target_unit.rect):
                     soldier.run = False
                     soldier.attack()
                     if soldier.attacking:
                         soldier.target_unit = target_unit
+
+
+def tower_collide(tower, target_unit):
+    if abs(tower.rect.centerx - target_unit.rect.centerx) <= tower.RANGE and not isinstance(target_unit, Wall):
+        tower.attacking = True
+        tower.resting = False
+    else:
+        tower.attacking = False
+        tower.resting = True
 
 
 def training(units):

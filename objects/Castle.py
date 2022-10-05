@@ -11,16 +11,15 @@ class Castle:
         barracks_x = BARRACKS_POS if player.player_type == "p1" else SCREEN_WIDTH - BARRACKS_POS
         mine_x = MINE_POS if player.player_type == "p1" else SCREEN_WIDTH - MINE_POS
         tower_x = WALL_POS if player.player_type == "p1" else SCREEN_WIDTH - WALL_POS
-        player_sprites = P1_SPRITES if player.player_type == "p1" else P2_SPRITES
+        building_sprites = P1_SPRITES if player.player_type == "p1" else P2_SPRITES
 
-        self.wall = Wall(player_sprites['building']['wall'], wall_x)
-        self.barracks = Barracks(player_sprites['building']['barracks'], barracks_x, player)
-        self.mine = Mine(player_sprites['building']['mine'], mine_x)
-        self.tower = Tower(player_sprites['building']['tower'], tower_x, player.player_type)
+        self.wall = Wall(building_sprites['building']['wall'], wall_x)
+        self.barracks = Barracks(building_sprites['building']['barracks'], barracks_x)
+        self.mine = Mine(building_sprites['building']['mine'], mine_x)
+        self.tower = Tower(building_sprites['building']['tower'], tower_x, player.player_type)
 
-    def update(self, target, enemy_units):
-        self.barracks.update()
-        # self.tower.update(target, enemy_units)
+    def update(self, target):
+        self.tower.update(target)
 
     def draw(self, screen):
         self.mine.draw(screen)
