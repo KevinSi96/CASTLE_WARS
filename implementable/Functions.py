@@ -50,7 +50,7 @@ def at_mine(workers):
 def run_to_wall(workers):
     for worker in workers and workers:
         # if worker.ready_to_dispatch and worker.player.castle.wall.health < Wall.MAX_HEALTH:
-        if worker.ready_to_dispatch and not worker.repairing:
+        if worker.ready_to_dispatch and not worker.repairing and worker.player.castle.wall.health < Wall.MAX_HEALTH:
             worker.deploy = True
             worker.run = True
             worker.digging = False
