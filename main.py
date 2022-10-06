@@ -2,6 +2,7 @@ import sys
 
 import pygame as pg
 
+from implementable import Functions
 from implementable.Functions import redraw_window
 from objects.Constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER1_KEY_COMMANDS, PLAYER2_KEY_COMMANDS
 from objects.Inputs import Inputs
@@ -47,10 +48,7 @@ def main():
                     player1.key_events(event.key)
                     player2.key_events(event.key)
                 if event.key == pg.K_SPACE:
-                    if pause:
-                        pause = False
-                    else:
-                        pause = True
+                    pause = not pause
                 if event.key == pg.K_r and pause:
                     restarted = True
                     pause = False

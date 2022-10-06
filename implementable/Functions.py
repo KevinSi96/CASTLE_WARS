@@ -1,3 +1,5 @@
+import time
+
 import pygame as pg
 
 from objects.Constants import *
@@ -263,8 +265,10 @@ def redraw_window(player1, player2, game_over, screen, winner, pause):
     screen.blit(ready_swordsmen_label_1, (ready_archers_label_1.get_width() + 15, 35))
     screen.blit(archers_in_training_1, (10, 45))
     screen.blit(swordsmen_in_training_1, (archers_in_training_1.get_width() + 15, 45))
-    screen.blit(ready_workers_label_1, (ready_archers_label_1.get_width() + ready_swordsmen_label_1.get_width() + 15, 35))
-    screen.blit(workers_in_training_1, (archers_in_training_1.get_width() + swordsmen_in_training_1.get_width() + 15, 45))
+    screen.blit(ready_workers_label_1,
+                (ready_archers_label_1.get_width() + ready_swordsmen_label_1.get_width() + 15, 35))
+    screen.blit(workers_in_training_1,
+                (archers_in_training_1.get_width() + swordsmen_in_training_1.get_width() + 15, 45))
     screen.blit(tot_soldiers_p1_label, (10, 60))
     # player 2 labels
     ready_archers_label_2 = DEFAULT_FONT.render(f"Ready Archers: {player2.num_archer}", True, (255, 0, 255))
@@ -280,11 +284,17 @@ def redraw_window(player1, player2, game_over, screen, winner, pause):
     tot_soldiers_p2_label = DEFAULT_FONT.render(f"Total number of soldiers: {player2.total_soldiers}",
                                                 1, (0, 0, 0))
     screen.blit(player2_resource_label, (SCREEN_WIDTH - player2_resource_label.get_width(), 5))
-    screen.blit(ready_archers_label_2, (SCREEN_WIDTH - ready_archers_label_2.get_width() - ready_swordsmen_label_2.get_width() - ready_workers_label_2.get_width() - 20, 35))
-    screen.blit(ready_swordsmen_label_2, (SCREEN_WIDTH - ready_archers_label_2.get_width() - ready_swordsmen_label_2.get_width() - 20, 35))
+    screen.blit(ready_archers_label_2, (
+    SCREEN_WIDTH - ready_archers_label_2.get_width() - ready_swordsmen_label_2.get_width() - ready_workers_label_2.get_width() - 20,
+    35))
+    screen.blit(ready_swordsmen_label_2,
+                (SCREEN_WIDTH - ready_archers_label_2.get_width() - ready_swordsmen_label_2.get_width() - 20, 35))
     screen.blit(ready_workers_label_2, (SCREEN_WIDTH - ready_archers_label_2.get_width() - 20, 35))
-    screen.blit(archers_in_training_2, (SCREEN_WIDTH - archers_in_training_2.get_width() - swordsmen_in_training_2.get_width() - workers_in_training_2.get_width() - 10, 45))
-    screen.blit(swordsmen_in_training_2, (SCREEN_WIDTH - archers_in_training_2.get_width() - swordsmen_in_training_2.get_width() - 20, 45))
+    screen.blit(archers_in_training_2, (
+    SCREEN_WIDTH - archers_in_training_2.get_width() - swordsmen_in_training_2.get_width() - workers_in_training_2.get_width() - 10,
+    45))
+    screen.blit(swordsmen_in_training_2,
+                (SCREEN_WIDTH - archers_in_training_2.get_width() - swordsmen_in_training_2.get_width() - 20, 45))
     screen.blit(workers_in_training_2, (SCREEN_WIDTH - archers_in_training_2.get_width() - 20, 45))
     screen.blit(tot_soldiers_p2_label, (SCREEN_WIDTH - tot_soldiers_p2_label.get_width() - 5, 60))
 
@@ -298,7 +308,8 @@ def redraw_window(player1, player2, game_over, screen, winner, pause):
         press_any_keyRect = press_any_key_label.get_rect(center=(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 3) + 50))
         screen.blit(press_any_key_label, press_any_keyRect)
     if pause:
-        pause_label = PRESS_ANY_KEY_FONT.render(f"Game has been pause, press space to resume o R to restart", True, (0, 100 ,0))
+        pause_label = PRESS_ANY_KEY_FONT.render(f"Game has been pause, press space to resume o R to restart", True,
+                                                (0, 100, 0))
         pause_label_rect = pause_label.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
         screen.blit(pause_label, pause_label_rect)
 
