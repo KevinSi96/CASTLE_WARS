@@ -1,55 +1,85 @@
-import time
+import sys
 
 import pygame as pg
-import random
 
-from objects.players.Archer import Archer
+from implementable import Functions
+from implementable.Functions import redraw_window
+from objects.Constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER1_KEY_COMMANDS, PLAYER2_KEY_COMMANDS
+from objects.Inputs import Inputs
+from objects.players.Player import Player
 
-WIDTH, HEIGHT = 1000, 250
+pg.init()
 
-INITIAL_RESOURCE = 1000
-
-screen = pg.display.set_mode((WIDTH, HEIGHT))
+screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
-BG = pg.transform.scale(pg.image.load("sprites/background/BG.jpg"), (WIDTH, HEIGHT))
+
+player1, player2 = None, None
 
 
 def main():
-    archers = []
+    global player1, player2
+    game_over = False
+    restarted = False
+    winner = None
+    pause = False
 
-    player1_resource = INITIAL_RESOURCE
-    player2_resource = INITIAL_RESOURCE
+    player1_inputs = Inputs(PLAYER1_KEY_COMMANDS)
+    player2_inputs = Inputs(PLAYER2_KEY_COMMANDS)
 
-    def redraw_window():
-        screen.blit(BG, (0, 0))
+    player1 = Player("p1", player1_inputs)
+    player2 = Player("p2", player2_inputs)
 
-        for archer in archers:
-            archer.draw(screen)
+    player1.opponent = player2
+    player2.opponent = player1
 
-        pg.display.update()
+    loop = True
 
-    loop = 1
     while loop:
-        clock.tick(10)
-        redraw_window()
-        keys = pg.key.get_pressed()
 
-        if keys[pg.K_t]:
-            archer = Archer(100, random.randrange(10, 30), 165, False, screen)
-            player1_resource -= archer.COST
-            archers.append(archer)
-        if keys[pg.K_d]:
-            for archer in archers:
-                archer.deploy = True
+        clock.tick(60)
+        redraw_window(player1, player2, game_over, screen, winner, pause)
 
         for event in pg.event.get():
-            if event.type == pg.QUIT:
-                loop = 0
 
-        for archer in archers:
-            if archer.deploy is True:
-                archer.move()
-                archer.update()
+            if event.type == pg.QUIT:
+                sys.exit()
+            if event.type == pg.KEYDOWN:
+                if not pause:
+                    player1.key_events(event.key)
+                    player2.key_events(event.key)
+                if event.key == pg.K_SPACE:
+                    pause = not pause
+                if event.key == pg.K_r and pause:
+                    restarted = True
+                    pause = False
+            if game_over and not restarted:
+                if event.type == pg.KEYDOWN:
+                    restarted = True
+                    game_over = False
+
+        if not game_over:
+            if restarted:
+                player1 = Player("p1", player1_inputs)
+                player2 = Player("p2", player2_inputs)
+                player1.opponent = player2
+                player2.opponent = player1
+                winner = None
+                restarted = False
+            elif not restarted and not pause:
+                game_over = player1.update(game_over)
+                game_over = player2.update(game_over)
+            elif pause:
+                pass
+
+        elif game_over:
+            player1.soldiers.clear()
+            player1.workers.clear()
+            player2.soldiers.clear()
+            player2.workers.clear()
+            if player1.castle.wall.health <= 0:
+                winner = "BLUE"
+            elif player2.castle.wall.health <= 0:
+                winner = "RED"
 
 
 if __name__ == '__main__':
